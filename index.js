@@ -14,7 +14,9 @@ const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE 
 const LangLoader                        = require('./app/assets/js/langloader')
 
 // Setup Lang
-LangLoader.setupLanguage()
+const dir = path.join(app.getPath('userData'), 'config.json')
+LangLoader.setupLanguage(dir)
+
 
 // Setup auto updater.
 function initAutoUpdater(event, data) {

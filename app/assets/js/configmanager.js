@@ -2,6 +2,7 @@ const fs   = require('fs-extra')
 const { LoggerUtil } = require('limbo-core')
 const os   = require('os')
 const path = require('path')
+const app = require('@electron/remote').app
 
 const logger = LoggerUtil.getLogger('ConfigManager')
 
@@ -9,7 +10,7 @@ const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.e
 
 const dataPath = path.join(sysRoot, '.limbostudios')
 
-const launcherDir = require('@electron/remote').app.getPath('userData')
+const launcherDir = app.getPath('userData')
 
 /**
  * Retrieve the absolute path of the launcher directory.
@@ -85,6 +86,7 @@ const DEFAULT_CONFIG = {
             launchDetached: true
         },
         launcher: {
+            language: 'en_US',
             allowPrerelease: false,
             dataDirectory: dataPath
         }
@@ -795,4 +797,36 @@ exports.getAllowPrerelease = function(def = false){
  */
 exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
+}
+
+exports.getCurrentLanguage = function(def = false){
+    return !def ? config.settings.launcher.language : DEFAULT_CONFIG.settings.launcher.language
+}
+
+/**
+ * Change the current language
+ * 
+ * @param {boolean} lang The language that should be selected
+ */
+exports.setLanguage = function(lang){
+    config.settings.launcher.language = lang
+    exports.save()
+    app.relaunch()
+    app.quit()
+}
+
+/**
+ * Get the list of all available languages
+ * 
+ * @param {function} callback
+ */
+exports.getAllLanguages = function(callback) {
+    fs.readdir('./app/assets/lang/', (err, files) => {
+        if (err) {
+            callback(err)
+        } else {
+            const fileNames = files.map(file => file.replace('.toml', ''))
+            callback(null, fileNames)
+        }
+    })
 }
