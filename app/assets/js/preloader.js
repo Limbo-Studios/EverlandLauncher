@@ -2,6 +2,7 @@ const {ipcRenderer}  = require('electron')
 const fs             = require('fs-extra')
 const os             = require('os')
 const path           = require('path')
+const launcherDir = path.join(require('@electron/remote').app.getPath('userData'), 'config.json')
 
 const ConfigManager  = require('./configmanager')
 const { DistroAPI }  = require('./distromanager')
@@ -23,7 +24,7 @@ DistroAPI['commonDir'] = ConfigManager.getCommonDirectory()
 DistroAPI['instanceDir'] = ConfigManager.getInstanceDirectory()
 
 // Load Strings
-LangLoader.setupLanguage()
+LangLoader.setupLanguage(launcherDir)
 
 /**
  * 

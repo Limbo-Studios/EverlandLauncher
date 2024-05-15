@@ -333,7 +333,7 @@ function populateAccountListings(){
     let htmlString = ''
     for(let i=0; i<accounts.length; i++){
         htmlString += `<button class="accountListing" uuid="${accounts[i].uuid}" ${!i && !accountSelectContent.hasAttribute("popup") ? 'selected' : ''}>
-            <img src="https://nmsr.lsmp.site/headiso/${accounts[i].uuid}">
+            <img src="https://nmsr.lsmp.site/headiso/${accounts[i].uuid}?width=40">
             <div class="accountListingName">${accounts[i].displayName}</div>
         </button>`
     }

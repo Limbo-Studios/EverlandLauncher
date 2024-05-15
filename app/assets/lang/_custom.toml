@@ -6,9 +6,9 @@ title = "Limbo Launcher"
 [ejs.landing]
 mediaGitHubURL = "https://github.com/Limbo-Studios/LimboLauncher"
 mediaTwitterURL = "https://twitter.com/lurkarya"
-mediaInstagramURL = "#"
+mediaInstagramURL = ""
 mediaYouTubeURL = "https://www.youtube.com/@Vigilante_LK"
-mediaDiscordURL = "https://discord.gg/8jFFMKMgkU"
+mediaDiscordURL = ""
 
 [ejs.settings]
 sourceGithubLink = "https://github.com/Limbo-Studios/LimboLauncher"
@@ -18,8 +18,8 @@ changeLanguageTitle = "Change the launcher language"
 changeLanguageDesc = "You can change the language in the list below. This text will not change if you change the language so you can find your wayback here to change it back"
 
 [ejs.welcome]
-welcomeHeader = "BIENVENIDO A LIMBO STUDIOS"
-welcomeDescription = "Hemos creado este launcher para que puedas disfrutar de nuestros proyectos, el proyecto en curso por ahora es Lurkarya, pero siempre podrán estar atentos a más!  Lurkarya es un servidor survival multijugador con lore, ahora estamos en el segundo acto y estamos impacientes por ver que les depará el destino ;)"
+welcomeHeader = "WELCOME TO LIMBO LAUNCHER"
+welcomeDescription = "We have created this launcher so you can enjoy our projects, the ongoing project for now is Lurkarya, but you can always keep an eye out for more! Lurkarya is a multiplayer survival server with lore, now we are in the second act and we can't wait to see what fate has in store for y'all ;).<br><br><center> You can change the launcher language in Settings --> Launcher"
 
 [ejs.overlay]
 changedLanguageHeader = "You changed the previous language"

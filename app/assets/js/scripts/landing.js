@@ -27,6 +27,7 @@ const {
     extractJdk
 }                             = require('limbo-core/java')
 
+
 // Internal Requirements
 const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
@@ -956,8 +957,7 @@ function displayArticle(articleObject, index){
  */
 async function loadNews(){
 
-    const distroData = await DistroAPI.getDistribution()
-    if(!distroData.rawDistribution.rss) {
+    if(!Lang.queryJS('news.NewsLink.URL')) {
         loggerLanding.debug('No RSS feed provided.')
 
         // remove the news button
@@ -968,7 +968,7 @@ async function loadNews(){
 
     const promise = new Promise((resolve, reject) => {
         
-        const newsFeed = distroData.rawDistribution.rss
+        const newsFeed = Lang.queryJS('news.NewsLink.URL')
         const newsHost = new URL(newsFeed).origin + '/'
         $.ajax({
             url: newsFeed,

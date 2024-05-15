@@ -1,4 +1,3 @@
-# Translate by Luis Bazán (luisbazandev) test
 [ejs.landing]
 updateAvailableTooltip = "Actualización disponible"
 usernamePlaceholder = "Nombre de usuario"
@@ -6,7 +5,7 @@ usernameEditButton = "Editar"
 settingsTooltip = "Configuraciónes"
 serverStatus = "SERVIDOR"
 serverStatusPlaceholder = "DESC."
-mojangStatus = "LIMBOAUTH"
+mojangStatus = "ESTADO DE LIMBOAUTH"
 mojangStatusTooltipTitle = "Servicios"
 mojangStatusNETitle = "No&nbsp;Esenciales"
 newsButton = "NOTICIAS"
@@ -43,11 +42,10 @@ cancelButton = "Cancelar"
 
 [ejs.overlay]
 serverSelectHeader = "Servidores disponibles"
-serverSelectConfirm = "Confirmar"
-serverSelectCancel = "Cancelar"
 accountSelectHeader = "Selecione una cuenta"
 accountSelectConfirm = "Confirmar"
 accountSelectCancel = "Cancelar"
+accountSelectManage = "Administrar cuentas"
 
 [ejs.settings]
 navHeaderText = "Configuración"
@@ -104,7 +102,7 @@ allowPrereleaseTitle = "Permitir versiones de pre lanzamiento(Pre-Release)."
 allowPrereleaseDesc = "Las versiones de pre lanzamiento incluyen nuevas características que talvez no estén del todo probadas o integradas.<br>Esto siempre será cierto si está utilizando una versión de pre lanzamiento."
 dataDirectoryTitle = "Carpeta de almacenamiento"
 selectDataDirectory = "Seleccionar carpeta de almacenamiento"
-chooseFolder = "Examinar folder"
+chooseFolder = "Examinar carpeta"
 dataDirectoryDesc = "Todos los archivos del juego y las instalaciones locales de Java se almacenarán en la carpeta de almacenamiento.<br>Las capturas de pantalla y los mundos se almacenan en la carpeta de la instancia para la configuración del servidor correspondiente."
 aboutTabHeaderText = "Acerca de"
 aboutTabHeaderDesc = "Ver información y registros de cambios de esta versión."
@@ -140,10 +138,10 @@ microsoftLoginTitle = "Iniciar sesión con Microsoft"
 microsoftLogoutTitle = "Cerrar sesión con Microsoft"
 
 [js.login]
-login = "Iniciar sesión"
-loggingIn = "Iniciando sesión"
-success = "Exitoso"
-tryAgain = "Intentar denuevo"
+login = "INICIAR SESIÓN"
+loggingIn = "INICIANDO SESIÓN"
+success = "EXITOSO"
+tryAgain = "Intentar de nuevo"
 
 [js.login.error]
 invalidValue = "* Valor invalido"
@@ -163,7 +161,7 @@ okay = "Okay"
 noAccountSelected = "Ninguna cuenta seleccionada"
 
 [js.landing.selectedServer]
-noSelection = "Ningun servidor selecionado"
+noSelection = "Ningún servidor selecionado"
 loading = "Cargando.."
 
 [js.landing.serverStatus]
@@ -218,6 +216,12 @@ joined = "Explorando los misterios de este lugar...!"
 
 [js.overlay]
 dismiss = "Dismiss"
+
+[js.processbuilder.exit]
+exitErrorHeader = "El juego se cerró con un código de error"
+message = "El juego se cerró de forma anormal con el código de error: "
+copyCode = "Código de error copiado"
+copyCodeText = "El código de error de minecraft "
 
 [js.settings.fileSelectors]
 executables = "Ejecutables"
@@ -280,6 +284,11 @@ latestVersionTitle = "Actualmente tiene la última versión"
 checkForUpdatesButton = "Buscar actualizaciones"
 checkingForUpdatesButton = "Buscando actualizaciones.."
 
+[js.settings.msftLogin]
+errorTitle = "El inicio de sesión en Microsoft falló"
+errorMessage = "No pudimos autenticar su cuenta de Microsoft. Inténtalo de nuevo."
+okButton = "OK"
+
 [js.uibinder.startup]
 fatalErrorTitle = "Error fatal: No se puede cargar el índice de distribución"
 fatalErrorMessage = "No se pudo establecer una conexión con nuestros servidores para descargar el índice de distribución. No había copias locales disponibles para cargar. <br><br>El índice de distribución es un archivo esencial que proporciona la información más reciente del servidor. El launcher no puede iniciarse sin él. Asegúrese de estar conectado a Internet y reinicie la aplicación."
@@ -296,3 +305,48 @@ selectAnotherAccountButton = "Selecionar otra cuenta"
 checkingForUpdateButton = "Buscando actualizaciones..."
 installNowButton = "Instalar ahora"
 checkForUpdatesButton = "Buscar actualizaciones"
+
+[js.auth.microsoft.error]
+noProfileTitle = "Error durante el inicio de sesión:<br>Perfil no configurado"
+noProfileDesc = "Su cuenta de Microsoft aún no tiene configurado un perfil de Minecraft. Si compraste el juego recientemente o lo canjeaste a través de Xbox Game Pass, debes configurar tu perfil en <a href=\"https://minecraft.net/\">Minecraft.net</a>.<br><br>Si aún no has comprado el juego, también puedes hacerlo en <a href=\"https://minecraft.net/\">Minecraft.net</a>."
+noXboxAccountTitle = "Error al iniciar sesión:<br>Sin cuenta Xbox"
+noXboxAccountDesc = "Su cuenta de Microsoft no tiene ninguna cuenta de Xbox asociada."
+xblBannedTitle = "Error al iniciar sesión:<br>Xbox Live no disponible"
+xblBannedDesc = "Su cuenta de Microsoft es de un país donde Xbox Live no está disponible o está prohibido."
+under18Title = "Error al iniciar sesión:<br>Se requiere aprobación de los padres"
+under18Desc = "Un adulto debe agregar las cuentas de usuarios menores de 18 años a una Familia."
+unknownTitle = "Error desconocido durante el inicio de sesión"
+unknownDesc = "Un error desconocido a ocurrido. Consulte la consola para obtener más detalles."
+
+[js.auth.mojang.error]
+methodNotAllowedTitle = "Error interno:<br>Método no permitido"
+methodNotAllowedDesc = "Método no permitido. Por favor informe este error."
+notFoundTitle = "Error interno:<br>No encontrado"
+notFoundDesc = "No se encontró la URL de autenticación. Por favor informe este problema."
+accountMigratedTitle = "Error al iniciar sesión:<br>Cuenta migrada"
+accountMigratedDesc = "Intentó iniciar sesión con una cuenta migrada. Vuelva a intentarlo utilizando el correo electrónico de la cuenta como nombre de usuario."
+invalidCredentialsTitle = "Error al iniciar sesión:<br>Credenciales no válidas"
+invalidCredentialsDesc = "El correo electrónico o la contraseña que has introducido son incorrectos. Inténtalo de nuevo."
+tooManyAttemptsTitle = "Error al iniciar sesión:<br>Demasiados intentos"
+tooManyAttemptsDesc = "Ha habido demasiados intentos de inicio de sesión con esta cuenta recientemente. Por favor, inténtelo de nuevo más tarde."
+invalidTokenTitle = "Error al iniciar sesión:<br>Token no válido"
+invalidTokenDesc = "El token de acceso proporcionado no es válido."
+tokenHasProfileTitle = "Error durante el inicio de sesión:<br>El token tiene perfil"
+tokenHasProfileDesc = "El token de acceso ya tiene un perfil asignado. La selección de perfiles aún no está implementada."
+credentialsMissingTitle = "Error al iniciar sesión:<br>Faltan credenciales"
+credentialsMissingDesc = "El nombre de usuario/contraseña no se envió o la contraseña tiene menos de 3 caracteres."
+invalidSaltVersionTitle = "Error al iniciar sesión:<br>Versión de Salt no válida"
+invalidSaltVersionDesc = "Versión de sal inválida."
+unsupportedMediaTypeTitle = "Error interno:<br>Tipo de medio no admitido"
+unsupportedMediaTypeDesc = "Tipo de medio no admitido. Por favor informe este error."
+accountGoneTitle = "Error al iniciar sesión:<br>Cuenta migrada"
+accountGoneDesc = "La cuenta se ha migrado a una cuenta de Microsoft. Inicie sesión con Microsoft."
+unreachableTitle = "Error al iniciar sesión:<br>Inalcanzable"
+unreachableDesc = "No se puede acceder a los servidores de autenticación. Asegúrese de que estén en línea y de que usted esté conectado a Internet."
+gameNotPurchasedTitle = "Error al iniciar sesión:<br>Juego no comprado"
+gameNotPurchasedDesc = "La cuenta con la que intentas iniciar sesión no ha comprado una copia de Minecraft. Puede adquirir una copia en <a href=\"https://minecraft.net/\">Minecraft.net</a>"
+unknownErrorTitle = "Error desconocido durante el inicio de sesión"
+unknownErrorDesc = "Un error desconocido a ocurrido. Consulte la consola para obtener más detalles."
+
+[js.news.NewsLink]
+URL = "https://news.lsmp.site/es_MX/category/Noticias/feed/"

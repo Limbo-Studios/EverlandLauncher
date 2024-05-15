@@ -1025,11 +1025,9 @@ async function reloadDropinMods(){
 
 //Languages
 let langCodes = {
-    "ja_JP": "日本人",
     "en_US": "English",
-    "es_ES": "Español",
-    "fr_FR": "Français",
-    "ko_KR": "한국어"
+    "es_MX": "Español",
+    "pt_BR": "Português"
 } 
 
 async function resolveLanguageForUI() {
