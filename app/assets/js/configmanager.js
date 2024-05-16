@@ -841,13 +841,14 @@ exports.getAllLanguages = function(callback) {
             callback(null, fileNames)
         }
     })
-}
-fs.readdir(path.join(process.cwd(), 'resources', 'lang'), (err, files) => {
-    if (err) {
-        callback(err)
     } else {
-        const fileNames = files.map(file => file.replace('.toml', ''))
-        callback(null, fileNames)
-    }
-})
-}}
+    fs.readdir(path.join(process.cwd(), 'Resources', 'lang'), (err, files) => {
+        if (err) {
+            callback(err)
+        } else {
+            const fileNames = files.map(file => file.replace('.toml', ''))
+            callback(null, fileNames)
+        }
+    })
+    }}
+}
