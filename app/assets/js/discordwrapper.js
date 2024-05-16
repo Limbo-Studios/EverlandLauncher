@@ -17,7 +17,7 @@ exports.initRPC = function(genSettings, servSettings, initialDetails = Lang.quer
         details: initialDetails,
         state: Lang.queryJS('discord.state', {shortId: servSettings.shortId}),
         largeImageKey: servSettings.largeImageKey,
-        largeImageText: servSettings.largeImageText,
+        largeImageText: Lang.queryJS('discord.srvt'),
         smallImageKey: genSettings.smallImageKey,
         smallImageText: genSettings.smallImageText,
         startTimestamp: new Date().getTime(),

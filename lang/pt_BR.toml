@@ -132,6 +132,7 @@ continueButton = "CONTINUAR"
 [js.discord]
 waiting = "Aguardando o cliente.."
 state = "Servidor: {shortId}"
+srvt = "Jogando em Lurkarya"
 
 [js.index]
 microsoftLoginTitle = "Login com Microsoft"

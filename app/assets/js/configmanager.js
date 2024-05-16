@@ -1,8 +1,9 @@
-const fs   = require('fs-extra')
+const fs             = require('fs-extra')
+const isDev          = require('./isdev')
 const { LoggerUtil } = require('limbo-core')
-const os   = require('os')
-const path = require('path')
-const app = require('@electron/remote').app
+const os             = require('os')
+const path           = require('path')
+const app            = require('@electron/remote').app
 
 const logger = LoggerUtil.getLogger('ConfigManager')
 
@@ -821,7 +822,18 @@ exports.setLanguage = function(lang){
  * @param {function} callback
  */
 exports.getAllLanguages = function(callback) {
-    fs.readdir('./app/assets/lang/', (err, files) => {
+    if(isDev){
+        fs.readdir(path.join(process.cwd(), 'lang'), (err, files) => {
+            if (err) {
+                callback(err)
+            } else {
+                const fileNames = files.map(file => file.replace('.toml', ''))
+                callback(null, fileNames)
+            }
+        })
+    } else {
+    if(process.platform === 'darwin'){
+    fs.readdir(path.join(process.cwd(), 'Content', 'Resources', 'lang'), (err, files) => {
         if (err) {
             callback(err)
         } else {
@@ -830,3 +842,12 @@ exports.getAllLanguages = function(callback) {
         }
     })
 }
+fs.readdir(path.join(process.cwd(), 'resources', 'lang'), (err, files) => {
+    if (err) {
+        callback(err)
+    } else {
+        const fileNames = files.map(file => file.replace('.toml', ''))
+        callback(null, fileNames)
+    }
+})
+}}

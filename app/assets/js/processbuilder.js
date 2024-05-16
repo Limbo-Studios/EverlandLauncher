@@ -2,6 +2,7 @@ const AdmZip                = require('adm-zip')
 const child_process         = require('child_process')
 const crypto                = require('crypto')
 const fs                    = require('fs-extra')
+const isDev                 = require('./isdev')
 const { LoggerUtil }        = require('limbo-core')
 const { getMojangOS, isLibraryCompatible, mcVersionAtLeast }  = require('limbo-core/common')
 const { Type }              = require('helios-distribution-types')
@@ -95,7 +96,7 @@ class ProcessBuilder {
         })
         child.on('close', (code, signal) => {
             logger.info('Exited with code', code)
-            if(code != 0){
+  /**            if(code != 0, 3221226505){
                 setOverlayContent(
                     Lang.queryJS('processbuilder.exit.exitErrorHeader'),
                     Lang.queryJS('processbuilder.exit.message') + code,
@@ -109,7 +110,7 @@ class ProcessBuilder {
                     toggleOverlay(false)
                 })
                 toggleOverlay(true, true)
-            }
+            }*/
             fs.remove(tempNativePath, (err) => {
                 if(err){
                     logger.warn('Error while deleting temp dir', err)
@@ -384,22 +385,79 @@ class ProcessBuilder {
 
         // Java Arguments
         if(process.platform === 'darwin'){
-            args.push('-Xdock:name=LimboLauncher')
-            args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+            if(isDev){
+                if (current.type === 'microsoft') {
+                    args.push('-Xdock:name=LimboLauncher')
+                    args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+                } else {
+                args.push('-Xdock:name=LimboLauncher')
+                args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+                args.push('-Duser.language=es')
+                args.push('-Dminecraft.api.env=custom')
+                args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+                args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+                args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+                args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+                args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')    
+                }
+            } else {
+            if (current.type === 'microsoft') {
+                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+                args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+                args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            } else {
+                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+                args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+                args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+                args.push('-Duser.language=es')
+                args.push('-Dminecraft.api.env=custom')
+                args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+                args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+                args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+                args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+                args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+                args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')
+            }
         }
-        args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
-        args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
-        args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-        args.push('-Djava.library.path=' + tempNativePath)
-        args.push('-Duser.language=es')
-        args.push('-Dminecraft.api.env=custom')
-        args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
-        args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
-        args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
-        args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
-        args.push(`-javaagent:${path.join(process.cwd(), 'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
-        args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')
-
+    }
+        if(isDev){
+            if (current.type === 'microsoft') {
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            } else {
+                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push('-Duser.language=es')
+            args.push('-Dminecraft.api.env=custom')
+            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')    
+            }
+        } else {
+        if (current.type === 'microsoft') {
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+        } else {
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push('-Duser.language=es')
+            args.push('-Dminecraft.api.env=custom')
+            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')
+        }
+    }
         // Main Java Class
         args.push(this.modManifest.mainClass)
 
@@ -442,12 +500,46 @@ class ProcessBuilder {
         //args.push('-Dlog4j.configurationFile=D:\\WesterosCraft\\game\\common\\assets\\log_configs\\client-1.12.xml')
 
         // Java Arguments
+        
         if(process.platform === 'darwin'){
+            if (current.type === 'microsoft') {
+                args.push('-Xdock:name=LimboLauncher')
+                args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+            } else {
             args.push('-Xdock:name=LimboLauncher')
             args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+            args.push('-Duser.language=es')
+            args.push('-Dminecraft.api.env=custom')
+            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+            args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')
         }
+    }
 
         const current = ConfigManager.getSelectedAccount()
+        
+        if(isDev){
+            if (current.type === 'microsoft') {
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            } else {
+                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
+            args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push('-Duser.language=es')
+            args.push('-Dminecraft.api.env=custom')
+            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/api/yggdrasil/authserver')
+            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
+            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
+            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')    
+            }
+        } else {
         if (current.type === 'microsoft') {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
@@ -462,9 +554,10 @@ class ProcessBuilder {
             args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/api/yggdrasil/api')
             args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/api/yggdrasil/sessionserver')
             args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/api/yggdrasil/minecraftservices')
-            args.push(`-javaagent:${path.join(process.cwd(), 'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/api/yggdrasil`)
             args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7InNlcnZlck5hbWUiOiJMaW1ibyIsImltcGxlbWVudGF0aW9uTmFtZSI6IllnZ2RyYXNpbCBBUEkgZm9yIEJsZXNzaW5nIFNraW4iLCJpbXBsZW1lbnRhdGlvblZlcnNpb24iOiI1LjIuMSIsImxpbmtzIjp7ImhvbWVwYWdlIjoiaHR0cHM6XC9cL2F1dGgubHNtcC5zaXRlIiwicmVnaXN0ZXIiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGVcL2F1dGhcL3JlZ2lzdGVyIn0sImZlYXR1cmUubm9uX2VtYWlsX2xvZ2luIjp0cnVlfSwic2tpbkRvbWFpbnMiOlsidGV4dHVyZXMubWluZWNyYWZ0Lm5ldCIsImF1dGgubHNtcC5zaXRlIl0sInNpZ25hdHVyZVB1YmxpY2tleSI6Ii0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tXG5NSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXNkaG9TWlJsOWs5dnc4eGdXUjVFXG5iR3RkRVQweTRrXC9zXC9OcUtreG1GTGFaaDBVZThGZW52TE1ibkpoTzlMUGFITlkza3RDYTZIbVFqSk5yeVFNaXVcbjFFVURhWnhwZHFqXC9abW03d1pcL3M3Y0V2NGxMMVVRaFE2K2R6QzExcXJXNDQxOXBWQ0xYcVRcL2dwVVp0VkU1cjdcbmJITmxPYzBBYm5ja2pcLzM5akhaNVZCdjd0YTd0d0JrVmx6ZG5vajJQSVk0S3A0ZjFkSkFpc08zcDZDaFJKZXc4XG5kRDhwcXJzTHAyXC9iY2tjTmRJNUttcVRNcVRFeVZjTDhXNnUyODhjcHlkSzZLUjdnNjJqaXNkS2gwbXc5NTM2VlxuVFwvVm1WWFpWZW1DcDh4eHp0QThUWVorUGZTVU1XK1BEYytXMWhscW9VeXNNbmtDNGZxa0JtSVFqOUt2OHZpOTNcbldvd2l5SUZqa0VkdU1NdkF0SnREMVVWZHUzRTBQVDR3YWtFdnpPcm9Fc0lFaElcL2dxRFN4dk1yWjNsZThZNG4zXG5vZ0F2NlMzZDFGcjhqK1F5cGhWRElySGZCY25DMElZWlE2czlnZmIyOStMbFhIZlIyUUtyQlQ0NURQUUE2Q1UxXG5wWGp6M1VCcjRtNys2MGc2bE5HYXZZbWpLSjNsRVwvNlRBQ2N2V2FFc3UxdHVqSGZnclJsWVwvNDgxXC9hNmZQUWtGXG5PVmtzNlZWZ1BJNWczQTduM3YzaEJcL3ZjUHFiQW04U01nMFwvMzFPZlNuSlJUZk5POXJEalpWc3FjKzB5bVRlTE1cbmtuYmk2dmZLVGEwYnV4NEhNbjlkMlpuRnhUNTRzeWdNa2N0Y3cyRFRZOVhrRXU5WG9PYWJxVnA4bXVVU1E0NEFcblJjbUw2S2VEWnlNUkMyb2VoRFg2bnFFQ0F3RUFBUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9')
         }
+    }
         //estoy hasta los uebos, saquenme de aqui :3
         // Main Java Class
         args.push(this.modManifest.mainClass)
@@ -561,7 +654,7 @@ class ProcessBuilder {
                             val = args[i].replace(argDiscovery, tempNativePath)
                             break
                         case 'launcher_name':
-                            val = args[i].replace(argDiscovery, 'Helios-Launcher')
+                            val = args[i].replace(argDiscovery, 'LimboLauncher')
                             break
                         case 'launcher_version':
                             val = args[i].replace(argDiscovery, this.launcherVersion)

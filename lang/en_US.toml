@@ -132,6 +132,7 @@ continueButton = "CONTINUE"
 [js.discord]
 waiting = "Waiting for Client.."
 state = "Server: {shortId}"
+srvt = "Playing on Lurkarya"
 
 [js.index]
 microsoftLoginTitle = "Microsoft Login"
@@ -211,8 +212,8 @@ checking = "Checking for News"
 
 [js.landing.discord]
 loading = "Loading game.."
-joining = "Sailing to Westeros!"
-joined = "Exploring the Realm!"
+joining = "In the Lurkarya menu!"
+joined = "Exploring the mysteries of this lands...!"
 
 [js.overlay]
 dismiss = "Dismiss"
