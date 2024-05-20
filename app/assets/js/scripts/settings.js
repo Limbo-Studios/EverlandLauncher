@@ -642,9 +642,9 @@ function populateAuthAccounts(){
     authKeys.forEach((val) => {
         const acc = authAccounts[val]
 
-        const accHtml = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
+        const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/fullbodyiso/${acc.uuid}">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/fullbodyiso/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -666,9 +666,9 @@ function populateAuthAccounts(){
             </div>
         </div>`
 
-        const accHtml2 = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
+        const microsoft = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://mc-heads.net/body/${acc.uuid}/60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.nickac.dev/fullbodyiso/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -690,10 +690,10 @@ function populateAuthAccounts(){
             </div>
         </div>`
 
-        if(acc.type === 'microsoft') {
-            microsoftAuthAccountStr += accHtml2
+        if(acc.type === 'mojang') {
+            mojangAuthAccountStr += mojang
         } else {
-            mojangAuthAccountStr += accHtml
+            microsoftAuthAccountStr += microsoft
         }
 
     })

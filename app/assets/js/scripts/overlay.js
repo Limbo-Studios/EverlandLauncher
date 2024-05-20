@@ -328,17 +328,38 @@ async function populateServerListings(){
 }
 
 function populateAccountListings(){
-    const accountsObj = ConfigManager.getAuthAccounts()
-    const accounts = Array.from(Object.keys(accountsObj), v=>accountsObj[v])
-    let htmlString = ''
-    for(let i=0; i<accounts.length; i++){
-        htmlString += `<button class="accountListing" uuid="${accounts[i].uuid}" ${!i && !accountSelectContent.hasAttribute("popup") ? 'selected' : ''}>
-            <img src="https://nmsr.lsmp.site/headiso/${accounts[i].uuid}?width=40">
-            <div class="accountListingName">${accounts[i].displayName}</div>
-        </button>`
+    const authAccounts = ConfigManager.getAuthAccounts()
+    const authKeys = Object.keys(authAccounts)
+    if(authKeys.length === 0){
+        return
     }
-    document.getElementById('accountSelectListScrollable').innerHTML = htmlString
 
+    let microsoftAuthAccountStr = ''
+    let mojangAuthAccountStr = ''
+
+    authKeys.forEach((val) => {
+        const acc = authAccounts[val]
+
+        const mojang = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !accountSelectContent.hasAttribute("popup") ? 'selected' : ''}>
+        <img src="https://nmsr.lsmp.site/headiso/${acc.uuid}?width=45">
+        <div class="accountListingName">${acc.displayName}</div>
+    </button>`
+
+        const microsoft = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !accountSelectContent.hasAttribute("popup") ? 'selected' : ''}>
+        <img src="https://nmsr.nickac.dev/headiso/${acc.uuid}?width=45">
+        <div class="accountListingName">${acc.displayName}</div>
+    </button>`
+
+        if(acc.type === 'microsoft') {
+            microsoftAuthAccountStr += microsoft
+        } else {
+            mojangAuthAccountStr += mojang
+        }
+
+    })
+
+    microsoftAccountSelectListScrollable.innerHTML = microsoftAuthAccountStr
+    mojangAccountSelectListScrollable.innerHTML = mojangAuthAccountStr
 }
 
 async function prepareServerSelectionList(){

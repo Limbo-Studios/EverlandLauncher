@@ -137,12 +137,21 @@ document.getElementById('settingsMediaButton').onclick = async e => {
 // Bind selected account
 function updateSelectedAccount(authUser){
     let username = Lang.queryJS('landing.selectedAccount.noAccountSelected')
+    const authAccounts = ConfigManager.getSelectedAccount()
+    const authKeys = Object.keys(authAccounts)
+    if(authKeys.length === 0){
+        return
+    }
+
     if(authUser != null){
+        const acc = authAccounts
         if(authUser.displayName != null){
             username = authUser.displayName
         }
-        if(authUser.uuid != null){
+        if(acc.type === 'mojang'){
             document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/fullbodyiso/${authUser.uuid}')`
+        } else { (acc.Type === 'microsoft')
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.nickac.dev/fullbodyiso/${authUser.uuid}')`
         }
     }
     user_text.innerHTML = username
