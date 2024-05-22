@@ -18,6 +18,26 @@ const loginRememberOption   = document.getElementById('loginRememberOption')
 const loginButton           = document.getElementById('loginButton')
 const loginForm             = document.getElementById('loginForm')
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    var registerButton = document.getElementById('registerButton');
+    if (registerButton) {
+        registerButton.addEventListener('click', function() {
+            openSkinUploader();
+        });
+    }
+});
+
+var skinUploaderWindow;
+
+function openSkinUploader() {
+    var url = 'https://authtest.lsmp.site/drasl/registration';
+    skinUploaderWindow = window.open(url, '_blank', 'width=600,height=900');
+
+}
+
+
+
 // Control variables.
 let lu = false, lp = false
 
