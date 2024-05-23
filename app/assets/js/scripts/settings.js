@@ -1027,6 +1027,7 @@ async function reloadDropinMods(){
 let langCodes = {
     "en_US": "English",
     "es_MX": "Español",
+    "fr_FR": "Français",
     "pt_BR": "Português"
 } 
 
