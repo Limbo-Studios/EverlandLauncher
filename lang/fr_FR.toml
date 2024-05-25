@@ -57,6 +57,7 @@ navLauncher = "Launcher"
 navAbout = "À propos"
 navUpdates = "Mises à jour"
 navDone = "Terminé"
+syncGameLang = "Si la langue du jeu doit être la même que celle du launcher"
 tabAccountHeaderText = "Paramètres du compte"
 tabAccountHeaderDesc = "Ajouter de nouveaux comptes ou gérer les comptes existants."
 microsoftAccount = "Microsoft"
@@ -350,4 +351,5 @@ unknownErrorTitle = "Erreur inconnue lors de la connexion"
 unknownErrorDesc = "Une erreur inconnue s'est produite. Veuillez consulter la console pour plus de détails."
 
 [js.news.NewsLink]
-URL = "https://news.lsmp.site/fr_FR/category/Noticias/feed/"
+URL = "https://news.lsmp.site/en_US/category/Noticias/feed/"
+#URL = "https://news.lsmp.site/fr_FR/category/Noticias/feed/" i will set this once i had set up the french lang on the news site

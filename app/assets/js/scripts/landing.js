@@ -149,7 +149,7 @@ function updateSelectedAccount(authUser){
         } if (acc.type === 'mojang'){
             document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/fullbodyiso/${authUser.uuid}')`
         } else { (acc.Type === 'microsoft')
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.nickac.dev/fullbodyiso/${authUser.uuid}')`
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsrmj.lsmp.site/fullbodyiso/${authUser.uuid}')`
         }
     }
     user_text.innerHTML = username

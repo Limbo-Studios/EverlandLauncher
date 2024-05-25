@@ -26,6 +26,11 @@ DistroAPI['instanceDir'] = ConfigManager.getInstanceDirectory()
 // Load Strings
 LangLoader.setupLanguage(launcherDir)
 
+//reload username
+    ConfigManager.reloadUsername();
+    setInterval(ConfigManager.reloadUsername, 60*1000)
+
+
 /**
  * 
  * @param {HeliosDistribution} data 

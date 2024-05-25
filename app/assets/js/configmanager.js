@@ -31,6 +31,22 @@ exports.getLauncherDirectory = function(){
 exports.getDataDirectory = function(def = false){
     return !def ? config.settings.launcher.dataDirectory : DEFAULT_CONFIG.settings.launcher.dataDirectory
 }
+/**
+ * Reloads the account name because using a custom authserver 
+ * won't do automatically the job, thanks to Ulysse2211
+ * 
+ */
+async function reloadUsername() {
+    const authAccounts = exports.getSelectedAccount();
+    const acc = authAccounts;
+
+    if (acc && acc.type === 'mojang') {
+        const gg = exports.getSelectedAccount();
+        let response = await fetch(`https://auth.lsmp.site/api/yggdrasil/sessionserver/session/minecraft/profile/${gg['uuid']}`);
+        response = await response.json();
+        exports.addMojangAuthAccount(gg['uuid'], gg['accessToken'], response['name'], response['name']);
+    }
+}
 
 /**
  * Set the new data directory.
@@ -84,7 +100,8 @@ const DEFAULT_CONFIG = {
             resHeight: 720,
             fullscreen: false,
             autoConnect: true,
-            launchDetached: true
+            launchDetached: true,
+            SyncLanguage: true
         },
         launcher: {
             language: 'en_US',
@@ -456,6 +473,8 @@ exports.setSelectedAccount = function(uuid){
     if(authAcc != null) {
         config.selectedAccount = uuid
     }
+    reloadUsername()
+
     return authAcc
 }
 
@@ -805,6 +824,25 @@ exports.getCurrentLanguage = function(def = false){
 }
 
 /**
+ * Change the status of if the game should be launched in fullscreen mode.
+ * 
+ * @param {boolean} SyncLanguage Whether or not the game should launch in fullscreen mode.
+ */
+exports.setSyncLanguage = function(SyncLanguage){
+    config.settings.game.SyncLanguage = SyncLanguage
+}
+
+/**
+ * Check if the game should auto connect to servers.
+ * 
+ * @param {boolean} def Optional. If true, the default value will be returned.
+ * @returns {boolean} Whether or not the game should auto connect to servers.
+ */
+exports.getSyncLanguage = function(def = false){
+    return !def ? config.settings.game.SyncLanguage : DEFAULT_CONFIG.settings.game.SyncLanguage
+}
+
+/**
  * Change the current language
  * 
  * @param {boolean} lang The language that should be selected
@@ -815,6 +853,10 @@ exports.setLanguage = function(lang){
     app.relaunch()
     app.quit()
 }
+
+// This exports the reloadUsername function for use in preloader
+
+exports.reloadUsername = reloadUsername
 
 /**
  * Get the list of all available languages
