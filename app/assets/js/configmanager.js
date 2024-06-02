@@ -871,7 +871,6 @@ exports.reloadUsername = reloadUsername
  * 
  * @param {function} callback
  */
-exports.getCurrentLanguage
 exports.getAllLanguages = function(callback) {
     if(isDev){
         fs.readdir(path.join(process.cwd(), 'lang'), (err, files) => {
