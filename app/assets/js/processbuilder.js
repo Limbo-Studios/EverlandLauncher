@@ -427,7 +427,7 @@ class ProcessBuilder {
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
             } else {
-                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
             args.push('-Duser.language=es')
@@ -533,8 +533,8 @@ class ProcessBuilder {
             }
           }
 
-        if(ConfigManager.getSyncLanguage()) {          
-          ChangeOption(path.join(this.gameDir, "options.txt"), 'lang:', 'lang:' + ConfigManager.getCurrentLanguage())
+        if(ConfigManager.getSyncLanguage()) {
+          ChangeOption(path.join(this.gameDir, "options.txt"), 'lang:', 'lang:' + ConfigManager.getCurrentLanguageLowecase())
         }
 
         //args.push('-Dlog4j.configurationFile=D:\\WesterosCraft\\game\\common\\assets\\log_configs\\client-1.12.xml')
