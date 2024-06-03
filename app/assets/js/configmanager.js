@@ -826,7 +826,7 @@ exports.getCurrentLanguage = function(def = false){
 /**
  * Convert the language code to lowercase for the launcher and game language sync.
  */
-exports.getCurrentLanguageLowecase = function(def = false) {
+exports.getCurrentLanguageLowercase = function(def = false) {
     const language = !def ? config.settings.launcher.language : DEFAULT_CONFIG.settings.launcher.language
     return language.toLowerCase()
 }

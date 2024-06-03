@@ -534,7 +534,7 @@ class ProcessBuilder {
           }
 
         if(ConfigManager.getSyncLanguage()) {
-          ChangeOption(path.join(this.gameDir, "options.txt"), 'lang:', 'lang:' + ConfigManager.getCurrentLanguageLowecase())
+          ChangeOption(path.join(this.gameDir, "options.txt"), 'lang:', 'lang:' + ConfigManager.getCurrentLanguageLowercase())
         }
 
         //args.push('-Dlog4j.configurationFile=D:\\WesterosCraft\\game\\common\\assets\\log_configs\\client-1.12.xml')
