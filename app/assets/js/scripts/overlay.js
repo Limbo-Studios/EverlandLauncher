@@ -343,12 +343,12 @@ function populateAccountListings(){
         const acc = authAccounts[val]
 
         const mojang = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
-        <img src="https://nmsr.lsmp.site/headiso/${acc.uuid}?width=45">
+        <img src="https://nmsr.lsmp.site/face/${acc.uuid}?width=45">
         <div class="accountListingName">${acc.displayName}</div>
     </button>`
 
         const microsoft = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
-        <img src="https://nmsrmj.lsmp.site/headiso/${acc.uuid}?width=45">
+        <img src="https://nmsrmj.lsmp.site/face/${acc.uuid}?width=45">
         <div class="accountListingName">${acc.displayName}</div>
     </button>`
 

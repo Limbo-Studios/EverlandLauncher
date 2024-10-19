@@ -145,11 +145,11 @@ function updateSelectedAccount(authUser){
             username = authUser.displayName
         }
         if(authUser.uuid != null){
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/fullbodyiso/${authUser.uuid}')`
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/face/${authUser.uuid}')`
         } if (acc.type === 'mojang'){
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/fullbodyiso/${authUser.uuid}')`
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/face/${authUser.uuid}')`
         } else { (acc.Type === 'microsoft')
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsrmj.lsmp.site/fullbodyiso/${authUser.uuid}')`
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsrmj.lsmp.site/face/${authUser.uuid}')`
         }
     }
     user_text.innerHTML = username

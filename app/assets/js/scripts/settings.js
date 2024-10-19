@@ -644,7 +644,7 @@ function populateAuthAccounts(){
 
         const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/fullbodyiso/${acc.uuid}?length=60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/bodybust/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -668,7 +668,7 @@ function populateAuthAccounts(){
 
         const microsoft = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsrmj.lsmp.site/fullbodyiso/${acc.uuid}?length=60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsrmj.lsmp.site/bodybust/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
