@@ -356,6 +356,11 @@ document.getElementById('settingsAddMojangAccount').onclick = (e) => {
 }
 
 // Bind the add microsoft account button.
+document.getElementById('settingsAddMicrosoftAccount').onclick = (e) => {
+    switchView(getCurrentView(), VIEWS.waiting, 500, 500, () => {
+        ipcRenderer.send(MSFT_OPCODE.OPEN_LOGIN, VIEWS.settings, VIEWS.settings)
+    })
+}
 
 // Bind reply for Microsoft Login.
 ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
@@ -663,7 +668,7 @@ function populateAuthAccounts(){
 
         const microsoft = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsrmj.lsmp.site/bodybust/${acc.uuid}?length=60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/bodybust/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">

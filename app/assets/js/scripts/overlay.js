@@ -348,7 +348,7 @@ function populateAccountListings(){
     </button>`
 
         const microsoft = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
-        <img src="https://nmsrmj.lsmp.site/face/${acc.uuid}?width=45">
+        <img src="https://nmsr.lsmp.site/face/${acc.uuid}?width=45">
         <div class="accountListingName">${acc.displayName}</div>
     </button>`
 

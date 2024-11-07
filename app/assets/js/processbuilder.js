@@ -129,7 +129,7 @@ class ProcessBuilder {
      * 
      * @returns {string} The classpath separator for the current operating system.
      */
-    static getClasspathSeparator() {
+    static getClasspathSeparator () {
         return process.platform === 'win32' ? ';' : ':'
     }
 
@@ -389,35 +389,24 @@ class ProcessBuilder {
                 if (current.type === 'microsoft') {
                     args.push('-Xdock:name=LimboLauncher')
                     args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+                    args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+
                 } else {
                 args.push('-Xdock:name=LimboLauncher')
                 args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-                args.push('-Duser.language=es')
-                args.push('-Dminecraft.api.env=custom')
-                args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-                args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-                args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-                args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
                 args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-                args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')    
                 }
             } else {
             if (current.type === 'microsoft') {
                 args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
                 args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
                 args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+                args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
             } else {
                 args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
                 args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
                 args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-                args.push('-Duser.language=es')
-                args.push('-Dminecraft.api.env=custom')
-                args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-                args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-                args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-                args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
                 args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-                args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
             }
         }
     }
@@ -426,36 +415,25 @@ class ProcessBuilder {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
             } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push('-Duser.language=es')
-            args.push('-Dminecraft.api.env=custom')
-            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
             args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')    
             }
         } else {
         if (current.type === 'microsoft') {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+
         } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push('-Duser.language=es')
-            args.push('-Dminecraft.api.env=custom')
-            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
             args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
         }
     }
         // Main Java Class
@@ -547,33 +525,23 @@ class ProcessBuilder {
             if (current.type === 'microsoft') {
                 args.push('-Xdock:name=LimboLauncher')
                 args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+
             } else {
             args.push('-Xdock:name=LimboLauncher')
             args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-            args.push('-Duser.language=es')
-            args.push('-Dminecraft.api.env=custom')
-            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
-            args.push(`-javaagent:${path.join(process.cwd(), 'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
         }
     } else {
         if (current.type === 'microsoft') {
             args.push('-Xdock:name=LimboLauncher')
             args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
+            args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+
         } else {
         args.push('-Xdock:name=LimboLauncher')
         args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-        args.push('-Duser.language=es')
-        args.push('-Dminecraft.api.env=custom')
-        args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-        args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-        args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-        args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
         args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-        args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
         }
     }
 }
@@ -585,36 +553,24 @@ class ProcessBuilder {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
             } else {
-                args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
+            args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push('-Duser.language=es')
-            args.push('-Dminecraft.api.env=custom')
-            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
             args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
-            }
+        }
         } else {
         if (current.type === 'microsoft') {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
         } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push('-Duser.language=es')
-            args.push('-Dminecraft.api.env=custom')
-            args.push('-Dminecraft.api.auth.host=https://auth.lsmp.site/authlib-injector/authserver')
-            args.push('-Dminecraft.api.account.host=https://auth.lsmp.site/authlib-injector/api')
-            args.push('-Dminecraft.api.session.host=https://auth.lsmp.site/authlib-injector/sessionserver')
-            args.push('-Dminecraft.api.services.host=https://auth.lsmp.site/authlib-injector/minecraftservices')
             args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
-            args.push('-Dauthlibinjector.yggdrasil.prefetched=eyJtZXRhIjp7ImltcGxlbWVudGF0aW9uTmFtZSI6IkF1dGhsaWItSW5qZWN0b3IgZW5kcG9pbnQgZm9yIExpbWJvQXV0aCIsImltcGxlbWVudGF0aW9uVmVyc2lvbiI6IjUuMi4yIiwibGlua3MiOnsiaG9tZXBhZ2UiOiJodHRwczpcL1wvYXV0aC5sc21wLnNpdGUiLCJyZWdpc3RlciI6Imh0dHBzOlwvXC9hdXRoLmxzbXAuc2l0ZVwvYXV0aFwvcmVnaXN0ZXIifSwic2VydmVyTmFtZSI6IkxpbWJvIiwiZmVhdHVyZS5ub25fZW1haWxfbG9naW4iOnRydWUsImZlYXR1cmUuZW5hYmxlX3Byb2ZpbGVfa2V5Ijp0cnVlLCJmZWF0dXJlLmVuYWJsZV9tb2phbmdfeWdnZHJhc2lsX3NlcnZpY2UiOnRydWV9LCJzaWduYXR1cmVQdWJsaWNrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFzZGhvU1pSbDlrOXZ3OHhnV1I1RVxuYkd0ZEVUMHk0a1wvc1wvTnFLa3htRkxhWmgwVWU4RmVudkxNYm5KaE85TFBhSE5ZM2t0Q2E2SG1RakpOcnlRTWl1XG4xRVVEYVp4cGRxalwvWm1tN3daXC9zN2NFdjRsTDFVUWhRNitkekMxMXFyVzQ0MTlwVkNMWHFUXC9ncFVadFZFNXI3XG5iSE5sT2MwQWJuY2tqXC8zOWpIWjVWQnY3dGE3dHdCa1ZsemRub2oyUElZNEtwNGYxZEpBaXNPM3A2Q2hSSmV3OFxuZEQ4cHFyc0xwMlwvYmNrY05kSTVLbXFUTXFURXlWY0w4VzZ1Mjg4Y3B5ZEs2S1I3ZzYyamlzZEtoMG13OTUzNlZcblRcL1ZtVlhaVmVtQ3A4eHh6dEE4VFlaK1BmU1VNVytQRGMrVzFobHFvVXlzTW5rQzRmcWtCbUlRajlLdjh2aTkzXG5Xb3dpeUlGamtFZHVNTXZBdEp0RDFVVmR1M0UwUFQ0d2FrRXZ6T3JvRXNJRWhJXC9ncURTeHZNclozbGU4WTRuM1xub2dBdjZTM2QxRnI4aitReXBoVkRJckhmQmNuQzBJWVpRNnM5Z2ZiMjkrTGxYSGZSMlFLckJUNDVEUFFBNkNVMVxucFhqejNVQnI0bTcrNjBnNmxOR2F2WW1qS0ozbEVcLzZUQUNjdldhRXN1MXR1akhmZ3JSbFlcLzQ4MVwvYTZmUFFrRlxuT1ZrczZWVmdQSTVnM0E3bjN2M2hCXC92Y1BxYkFtOFNNZzBcLzMxT2ZTbkpSVGZOTzlyRGpaVnNxYysweW1UZUxNXG5rbmJpNnZmS1RhMGJ1eDRITW45ZDJabkZ4VDU0c3lnTWtjdGN3MkRUWTlYa0V1OVhvT2FicVZwOG11VVNRNDRBXG5SY21MNktlRFp5TVJDMm9laERYNm5xRUNBd0VBQVE9PVxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXG4iLCJza2luRG9tYWlucyI6WyJ0ZXh0dXJlcy5taW5lY3JhZnQubmV0IiwiYXV0aC5sc21wLnNpdGUiXX0=')
         }
     }
         //estoy hasta los uebos, saquenme de aqui :3
