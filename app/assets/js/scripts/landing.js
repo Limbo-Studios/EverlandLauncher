@@ -31,6 +31,7 @@ const {
 // Internal Requirements
 const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
+const crypto                  = require('crypto')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -451,12 +452,17 @@ const GAME_JOINED_REGEX = /\[.+\]: Sound engine started/
 const GAME_LAUNCH_REGEX = /^\[.+\]: (?:MinecraftForge .+ Initialized|ModLauncher .+ starting: .+|Loading Minecraft .+ with Fabric Loader .+)$/
 const MIN_LINGER = 5000
 
+// List of mods to exclude from validation
+const EXCLUDED_MODS = [
+]
+
 async function dlAsync(login = true) {
 
     // Login parameter is temporary for debug purposes. Allows testing the validation/downloads without
     // launching the game.
 
     const loggerLaunchSuite = LoggerUtil.getLogger('LaunchSuite')
+    const loggerLanding = LoggerUtil.getLogger('dlAsync')
 
     setLaunchDetails(Lang.queryJS('landing.dlAsync.loadingServerInfo'))
 
@@ -466,18 +472,131 @@ async function dlAsync(login = true) {
         distro = await DistroAPI.refreshDistributionOrFallback()
         onDistroRefresh(distro)
     } catch(err) {
-        loggerLaunchSuite.error('Unable to refresh distribution index.', err)
+        loggerLanding.error(Lang.queryJS('landing.dlAsync.unableToLoadDistributionIndex'))
         showLaunchFailure(Lang.queryJS('landing.dlAsync.fatalError'), Lang.queryJS('landing.dlAsync.unableToLoadDistributionIndex'))
         return
     }
 
     const serv = distro.getServerById(ConfigManager.getSelectedServer())
 
-    if(login) {
-        if(ConfigManager.getSelectedAccount() == null){
-            loggerLanding.error('You must be logged into an account.')
+    if (login) {
+        if (ConfigManager.getSelectedAccount() == null) {
+            loggerLanding.error(Lang.queryJS('landing.dlAsync.accountLoginNeeded'))
             return
         }
+    }
+
+    // --------- Mod Verification Logic ---------
+
+    if (extraFileVerif.status) {
+        loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.usingExtraFileVerif'))
+
+        const modsDir = path.join(ConfigManager.getDataDirectory(), 'instances', serv.rawServer.id, 'mods')
+
+        // Check if mods directory exists, if not, create it
+        if (!fs.existsSync(modsDir)) {
+            fs.mkdirSync(modsDir, {recursive: true})
+        }
+
+        const distroMods = {}
+        const mdls = serv.modules
+
+        // Populate expected mod identities and log them
+        mdls.forEach(mdl => {
+            if (mdl.rawModule.name.endsWith('.jar')) {
+                const modPath = path.join(modsDir, mdl.rawModule.name)
+                const modIdentity = mdl.rawModule.identity || mdl.rawModule.artifact.MD5
+                if (extraFileVerif.debug) {
+                    loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.distributionIdentityError', {
+                        'moduleName': mdl.rawModule.name,
+                        'moduleIdentity': modIdentity
+                    }))
+                }
+
+                distroMods[modPath] = modIdentity
+            }
+        })
+
+        // Function to extract mod identity from the jar file
+        const extractModIdentity = (filePath) => {
+            if (extraFileVerif.debug) {
+                loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.modIdentityExtraction', {'filePath': filePath}))
+            }
+
+            const fileBuffer = fs.readFileSync(filePath)
+            const hashSum = crypto.createHash('md5')  // Use MD5 to match the distribution configuration
+            hashSum.update(fileBuffer)
+            const hash = hashSum.digest('hex')
+            if (extraFileVerif.debug) {
+                loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.identityNotFoundUsingHash', {
+                    'filePath': filePath,
+                    'hash': hash
+                }))
+            }
+
+            return hash
+        }
+
+        // Validate mods function
+        const validateMods = () => {
+            loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.startingModValidation'))
+            const installedMods = fs.readdirSync(modsDir)
+            let valid = true
+
+            for (let mod of installedMods) {
+                const modPath = path.join(modsDir, mod)
+
+                // Skip validation for mods in the excluded list
+                if (EXCLUDED_MODS.includes(mod)) {
+                    loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.modValidationBypassed', {'mod': mod}))
+                    continue
+                }
+
+                const expectedIdentity = distroMods[modPath]
+                loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.validatingMod', {'mod': mod}))
+
+                if (expectedIdentity) {
+                    const modIdentity = extractModIdentity(modPath)
+                    if (extraFileVerif.debug) {
+                        loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.expectedAndCalculatedIdentity', {
+                            'expectedIdentity': expectedIdentity,
+                            'mod': mod,
+                            'modIdentity': modIdentity
+                        }))
+                    }
+
+                    if (modIdentity !== expectedIdentity) {
+                        if (extraFileVerif.debug) {
+                            loggerLanding.error(Lang.queryJS('landing.dlAsync.extraFileVerif.modIdentityMismatchError', {
+                                'mod': mod,
+                                'expectedIdentity': expectedIdentity,
+                                'modIdentity': modIdentity
+                            }))
+                        }
+
+                        valid = false
+                        break
+                    }
+                } else {
+                    loggerLanding.warn(Lang.queryJS('landing.dlAsync.extraFileVerif.expectedIdentityNotFound', {'mod': mod}))
+                    valid = false
+                    break
+                }
+            }
+
+            loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.modValidationCompleted'))
+            return valid
+        }
+
+        // Perform mod validation before proceeding
+        if (!validateMods()) {
+            const errorMessage = Lang.queryJS('landing.dlAsync.extraFileVerif.invalidModsDetectedMessage', {'folder': ConfigManager.getNameDataPath()})
+            loggerLanding.error(errorMessage)
+            showLaunchFailure(errorMessage, null)
+            return
+        }
+    } else {
+        loggerLanding.info(Lang.queryJS('landing.dlAsync.extraFileVerif.notUsingExtraFileVerif'))
     }
 
     setLaunchDetails(Lang.queryJS('landing.dlAsync.pleaseWait'))
@@ -495,17 +614,17 @@ async function dlAsync(login = true) {
     fullRepairModule.spawnReceiver()
 
     fullRepairModule.childProcess.on('error', (err) => {
-        loggerLaunchSuite.error('Error during launch', err)
+        loggerLaunchSuite.error(Lang.queryJS('landing.dlAsync.errorDuringLaunchText') + err)
         showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringLaunchTitle'), err.message || Lang.queryJS('landing.dlAsync.errorDuringLaunchText'))
     })
     fullRepairModule.childProcess.on('close', (code, _signal) => {
         if(code !== 0){
-            loggerLaunchSuite.error(`Full Repair Module exited with code ${code}, assuming error.`)
+            loggerLaunchSuite.error(Lang.queryJS('landing.dlAsync.fullRepairMode', {'code': code}))
             showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringLaunchTitle'), Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
         }
     })
 
-    loggerLaunchSuite.info('Validating files.')
+    loggerLaunchSuite.info(Lang.queryJS('landing.dlAsync.validatingFileIntegrity'))
     setLaunchDetails(Lang.queryJS('landing.dlAsync.validatingFileIntegrity'))
     let invalidFileCount = 0
     try {
@@ -514,7 +633,7 @@ async function dlAsync(login = true) {
         })
         setLaunchPercentage(100)
     } catch (err) {
-        loggerLaunchSuite.error('Error during file validation.')
+        loggerLaunchSuite.error(Lang.queryJS('landing.dlAsync.errFileVerification'))
         showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringFileVerificationTitle'), err.displayable || Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
         return
     }
@@ -530,12 +649,12 @@ async function dlAsync(login = true) {
             })
             setDownloadPercentage(100)
         } catch(err) {
-            loggerLaunchSuite.error('Error during file download.')
+            loggerLaunchSuite.error(Lang.queryJS('landing.dlAsync.errorDuringFileDownloadTitle'))
             showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringFileDownloadTitle'), err.displayable || Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
             return
         }
     } else {
-        loggerLaunchSuite.info('No invalid files, skipping download.')
+        loggerLaunchSuite.info(Lang.queryJS('landing.dlAsync.notUsingExtraFileVerif.downloadingFiles'))
     }
 
     // Remove download bar.
@@ -614,7 +733,7 @@ async function dlAsync(login = true) {
             // Build Minecraft process.
             proc = pb.build()
 
-            // Bind listeners to stdout.
+            // Bind listeners to stdout and stderr.
             proc.stdout.on('data', tempListener)
             proc.stderr.on('data', gameErrorListener)
 

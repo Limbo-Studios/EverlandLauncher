@@ -73,6 +73,11 @@ function mojangErrorDisplayable(errorCode) {
                 title: Lang.queryJS('auth.mojang.error.invalidCredentialsTitle'),
                 desc: Lang.queryJS('auth.mojang.error.invalidCredentialsDesc')
             }
+        case MojangErrorCode.ERROR_PLAYER_NOT_FOUND:
+            return {
+                title: Lang.queryJS('auth.mojang.error.playerNotFoundTitle'),
+                desc: Lang.queryJS('auth.mojang.error.playerNotFoundDesc')
+            }
         case MojangErrorCode.ERROR_RATELIMIT:
             return {
                 title: Lang.queryJS('auth.mojang.error.tooManyAttemptsTitle'),

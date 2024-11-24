@@ -9,9 +9,22 @@ const logger = LoggerUtil.getLogger('ConfigManager')
 
 const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME)
 
-const dataPath = path.join(sysRoot, '.limbostudios')
+const nameDataPath = '.limbostudios'
+
+const dataPath = path.join(sysRoot, nameDataPath)
 
 const launcherDir = app.getPath('userData')
+
+/**
+ * The path to the data directory used by the application.
+ * This variable can be used to retrieve or set the location
+ * where the application's data files are stored.
+ *
+ * @type {string}
+ */
+exports.getNameDataPath = function(){
+    return nameDataPath
+}
 
 /**
  * Retrieve the absolute path of the launcher directory.
