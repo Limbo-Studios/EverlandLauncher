@@ -654,7 +654,7 @@ async function dlAsync(login = true) {
             return
         }
     } else {
-        loggerLaunchSuite.info(Lang.queryJS('landing.dlAsync.notUsingExtraFileVerif.downloadingFiles'))
+        loggerLaunchSuite.info(Lang.queryJS('landing.dlAsync.extraFileVerif.downloadingFiles'))
     }
 
     // Remove download bar.
