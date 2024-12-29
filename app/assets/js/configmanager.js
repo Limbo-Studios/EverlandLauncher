@@ -4,6 +4,7 @@ const { LoggerUtil } = require('limbo-core')
 const os             = require('os')
 const path           = require('path')
 const app            = require('@electron/remote').app
+const { v4: uuidv4 } = require('uuid');
 
 const logger = LoggerUtil.getLogger('ConfigManager')
 
@@ -57,7 +58,8 @@ async function reloadUsername() {
         const gg = exports.getSelectedAccount();
         let response = await fetch(`https://auth.lsmp.site/api/yggdrasil/sessionserver/session/minecraft/profile/${gg['uuid']}`);
         response = await response.json();
-        exports.addMojangAuthAccount(gg['uuid'], gg['accessToken'], response['name'], response['name']);
+        exports.updateMojangUserProfile(gg['clientToken'], response['name']);
+        exports.save()
     }
 }
 
@@ -127,7 +129,7 @@ const DEFAULT_CONFIG = {
         content: null,
         dismissed: false
     },
-    clientToken: null,
+    clientToken: null, // Not used anymore since clientToken is now stored in the authenticationDatabase and generated in each login
     selectedServer: null, // Resolved
     selectedAccount: null,
     authenticationDatabase: {},
@@ -294,18 +296,30 @@ exports.getInstanceDirectory = function(){
  * 
  * @returns {string} The launcher's Client Token.
  */
+/*
 exports.getClientToken = function(){
     return config.clientToken
 }
+*/
 
 /**
  * Set the launcher's Client Token.
  * 
  * @param {string} clientToken The launcher's new Client Token.
  */
-exports.setClientToken = function(clientToken){
+/*exports.setClientToken = function(clientToken){
     config.clientToken = clientToken
+}*/
+
+/**
+ * Genera una UUID v4 sin guiones.
+ * @returns {string} La UUID generada sin guiones.
+ */
+
+ exports.generateClientToken = function() {
+    return uuidv4().replace(/-/g, '');
 }
+
 /**
  * 
  * @param {string} PlayerMeta 
@@ -318,7 +332,7 @@ exports.setClientToken = function(clientToken){
  * @returns {string} The ID of the selected serverpack.
  */
 exports.getSelectedServer = function(def = false){
-    return !def ? config.selectedServer : DEFAULT_CONFIG.clientToken
+    return !def ? config.selectedServer : DEFAULT_CONFIG.clientToken //HUH PARA QUE ES ESTO?
 }
 
 /**
@@ -346,8 +360,8 @@ exports.getAuthAccounts = function(){
  * @param {string} uuid The uuid of the authenticated account.
  * @returns {Object} The authenticated account with the given uuid.
  */
-exports.getAuthAccount = function(uuid){
-    return config.authenticationDatabase[uuid]
+exports.getAuthAccount = function(clientToken){
+    return config.authenticationDatabase[clientToken]
 }
 
 /**
@@ -358,10 +372,28 @@ exports.getAuthAccount = function(uuid){
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
-exports.updateMojangAuthAccount = function(uuid, accessToken){
-    config.authenticationDatabase[uuid].accessToken = accessToken
-    config.authenticationDatabase[uuid].type = 'mojang' // For gradual conversion.
-    return config.authenticationDatabase[uuid]
+exports.updateMojangAuthAccount = function(clientToken, accessToken, availableProfiles, username){
+    config.authenticationDatabase[clientToken].accessToken = accessToken
+    config.authenticationDatabase[clientToken].availableProfiles = availableProfiles
+    config.authenticationDatabase[clientToken].username = username
+    config.authenticationDatabase[clientToken].displayName = username
+    config.authenticationDatabase[clientToken].type = 'mojang' // For gradual conversion.
+    return config.authenticationDatabase[clientToken]
+}
+
+/**
+ * Update the username of an authenticated mojang account.
+ * 
+ * @param {string} uuid The uuid of the authenticated account.
+ * @param {string} accessToken The new Access Token.
+ * 
+ * @returns {Object} The authenticated account object created by this action.
+ */
+
+exports.updateMojangUserProfile = function(clientToken, username){
+    config.authenticationDatabase[clientToken].username = username
+    config.authenticationDatabase[clientToken].displayName = username
+    return config.authenticationDatabase[clientToken]
 }
 
 /**
@@ -374,16 +406,19 @@ exports.updateMojangAuthAccount = function(uuid, accessToken){
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
-exports.addMojangAuthAccount = function(uuid, accessToken, username, displayName){
-    config.selectedAccount = uuid
-    config.authenticationDatabase[uuid] = {
+exports.addMojangAuthAccount = function(uuid, accountID, accessToken, clientToken, username, displayName, availableProfiles){
+    config.selectedAccount = clientToken
+    config.authenticationDatabase[clientToken] = {
         type: 'mojang',
         accessToken,
+        clientToken,
+        accountID,
         username: username.trim(),
         uuid: uuid.trim(),
+        availableProfiles,
         displayName: displayName.trim()
     }
-    return config.authenticationDatabase[uuid]
+    return config.authenticationDatabase[clientToken]
 }
 
 /**
@@ -447,16 +482,15 @@ exports.addMicrosoftAuthAccount = function(uuid, accessToken, name, mcExpires, m
  * 
  * @returns {boolean} True if the account was removed, false if it never existed.
  */
-exports.removeAuthAccount = function(uuid){
-    if(config.authenticationDatabase[uuid] != null){
-        delete config.authenticationDatabase[uuid]
-        if(config.selectedAccount === uuid){
+exports.removeAuthAccount = function(clientToken){
+    if(config.authenticationDatabase[clientToken] != null){
+        delete config.authenticationDatabase[clientToken]
+        if(config.selectedAccount === clientToken){
             const keys = Object.keys(config.authenticationDatabase)
             if(keys.length > 0){
                 config.selectedAccount = keys[0]
             } else {
                 config.selectedAccount = null
-                config.clientToken = null
             }
         }
         return true
@@ -481,10 +515,10 @@ exports.getSelectedAccount = function(){
  * 
  * @returns {Object} The selected authenticated account.
  */
-exports.setSelectedAccount = function(uuid){
-    const authAcc = config.authenticationDatabase[uuid]
+exports.setSelectedAccount = function(clientToken){
+    const authAcc = config.authenticationDatabase[clientToken]
     if(authAcc != null) {
-        config.selectedAccount = uuid
+        config.selectedAccount = clientToken
     }
     reloadUsername()
 

@@ -7,7 +7,8 @@ const fs = require('fs-extra');
 const LangLoader                                   = require('./assets/js/langloader')
 const DropinModUtil                                = require('./assets/js/dropinmodutil')
 const extraFileVerif                               = require('./assets/extraverif/parserExtraverif')
-const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants')
+const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants');
+const { log } = require('console');
 const logger = LoggerUtil.getLogger('Settings')
 
 const settingsState = {
@@ -356,13 +357,6 @@ document.getElementById('settingsAddMojangAccount').onclick = (e) => {
     })
 }
 
-// Bind the add microsoft account button.
-document.getElementById('settingsAddMicrosoftAccount').onclick = (e) => {
-    switchView(getCurrentView(), VIEWS.waiting, 500, 500, () => {
-        ipcRenderer.send(MSFT_OPCODE.OPEN_LOGIN, VIEWS.settings, VIEWS.settings)
-    })
-}
-
 // Bind reply for Microsoft Login.
 ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
     if (arguments_[0] === MSFT_REPLY_TYPE.ERROR) {
@@ -468,7 +462,7 @@ function bindAuthAccountSelect(){
             }
             val.setAttribute('selected', '')
             val.innerHTML = Lang.queryJS('settings.authAccountSelect.selectedButton')
-            setSelectedAccount(val.closest('.settingsAuthAccount').getAttribute('uuid'))
+            setSelectedAccount(val.closest('.settingsAuthAccount').getAttribute('clientToken'))
         }
     })
 }
@@ -515,19 +509,21 @@ let msAccDomElementCache
  */
 function processLogOut(val, isLastAccount){
     const parent = val.closest('.settingsAuthAccount')
-    const uuid = parent.getAttribute('uuid')
+    const clientToken = parent.getAttribute('clientToken')
     const prevSelAcc = ConfigManager.getSelectedAccount()
-    const targetAcc = ConfigManager.getAuthAccount(uuid)
+    const targetAcc = ConfigManager.getAuthAccount(clientToken)
     if(targetAcc.type === 'microsoft') {
         msAccDomElementCache = parent
         switchView(getCurrentView(), VIEWS.waiting, 500, 500, () => {
-            ipcRenderer.send(MSFT_OPCODE.OPEN_LOGOUT, uuid, isLastAccount)
+            ipcRenderer.send(MSFT_OPCODE.OPEN_LOGOUT, clientToken, isLastAccount)
         })
     } else {
-        AuthManager.removeMojangAccount(uuid).then(() => {
-            if(!isLastAccount && uuid === prevSelAcc.uuid){
+        AuthManager.removeMojangAccount(clientToken).then(() => {
+            if(!isLastAccount && clientToken === prevSelAcc.clientToken){
+                logger.info('selected token:', clientToken)
+                logger.info('prev token:', prevSelAcc.clientToken)
                 const selAcc = ConfigManager.getSelectedAccount()
-                refreshAuthAccountSelected(selAcc.uuid)
+                refreshAuthAccountSelected(selAcc.clientToken)
                 updateSelectedAccount(selAcc)
                 validateSelectedAccount()
             }
@@ -568,17 +564,17 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
         })
     } else if(arguments_[0] === MSFT_REPLY_TYPE.SUCCESS) {
         
-        const uuid = arguments_[1]
+        const clientToken = arguments_[1]
         const isLastAccount = arguments_[2]
         const prevSelAcc = ConfigManager.getSelectedAccount()
 
-        msftLogoutLogger.info('Logout Successful. uuid:', uuid)
+        msftLogoutLogger.info('Logout Successful. clientToken:', clientToken)
         
-        AuthManager.removeMicrosoftAccount(uuid)
+        AuthManager.removeMicrosoftAccount(clientToken)
             .then(() => {
-                if(!isLastAccount && uuid === prevSelAcc.uuid){
+                if(!isLastAccount && clientToken === prevSelAcc.clientToken){
                     const selAcc = ConfigManager.getSelectedAccount()
-                    refreshAuthAccountSelected(selAcc.uuid)
+                    refreshAuthAccountSelected(selAcc.clientToken)
                     updateSelectedAccount(selAcc)
                     validateSelectedAccount()
                 }
@@ -606,12 +602,12 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
  * Refreshes the status of the selected account on the auth account
  * elements.
  * 
- * @param {string} uuid The UUID of the new selected account.
+ * @param {string} clientToken TheclientToken of the new selected account.
  */
-function refreshAuthAccountSelected(uuid){
+function refreshAuthAccountSelected(clientToken){
     Array.from(document.getElementsByClassName('settingsAuthAccount')).map((val) => {
         const selBtn = val.getElementsByClassName('settingsAuthAccountSelect')[0]
-        if(uuid === val.getAttribute('uuid')){
+        if(clientToken === val.getAttribute('clientToken')){
             selBtn.setAttribute('selected', '')
             selBtn.innerHTML = Lang.queryJS('settings.authAccountSelect.selectedButton')
         } else {
@@ -636,14 +632,17 @@ function populateAuthAccounts(){
         return
     }
     const selectedUUID = ConfigManager.getSelectedAccount().uuid
+    const selectedClient = ConfigManager.getSelectedAccount().clientToken
+    logger.info('Selected Client:', selectedClient)
 
     let microsoftAuthAccountStr = ''
     let mojangAuthAccountStr = ''
 
     authKeys.forEach((val) => {
         const acc = authAccounts[val]
+        logger.info('Actual Client:', acc.clientToken)
 
-        const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
+        const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}" clientToken="${acc.clientToken}">
             <div class="settingsAuthAccountLeft">
                 <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/bodybust/${acc.uuid}?length=60">
             </div>
@@ -659,7 +658,7 @@ function populateAuthAccounts(){
                     </div>
                 </div>
                 <div class="settingsAuthAccountActions">
-                    <button class="settingsAuthAccountSelect" ${selectedUUID === acc.uuid ? 'selected>' + Lang.queryJS('settings.authAccountPopulate.selectedAccount') : '>' + Lang.queryJS('settings.authAccountPopulate.selectAccount')}</button>
+                    <button class="settingsAuthAccountSelect" ${selectedClient === acc.clientToken ? 'selected>' + Lang.queryJS('settings.authAccountPopulate.selectedAccount') : '>' + Lang.queryJS('settings.authAccountPopulate.selectAccount')}</button>
                     <div class="settingsAuthAccountWrapper">
                         <button class="settingsAuthAccountLogOut">${Lang.queryJS('settings.authAccountPopulate.logout')}</button>
                     </div>
@@ -699,7 +698,6 @@ function populateAuthAccounts(){
 
     })
 
-    settingsCurrentMicrosoftAccounts.innerHTML = microsoftAuthAccountStr
     settingsCurrentMojangAccounts.innerHTML = mojangAuthAccountStr
 }
 

@@ -149,6 +149,20 @@ async function toggleAccountSelection(toggleState, popup = false){
     toggleOverlay(toggleState, false, 'accountSelectContent', popup)
 }
 
+async function toggleProfileSwitch(toggleState, popup = false){    
+    if (popup) {
+        // set the accountSelectActions div to display: none to avoid colliding with the validateSelectedAccount function
+        document.getElementById('accountSelectActions').style.display = 'none'
+    } else {
+        // set the overlayContainer div to display: block, this is not done while closing the overlay because of the fadeOut effect
+        document.getElementById('accountSelectActions').style.display = 'block'
+    }
+
+    // show the overlay
+    await prepareProfilesList()
+    toggleOverlay(toggleState, false, 'accountSelectContent', popup)
+}
+
 /**
  * Set the content of the overlay.
  * 
@@ -203,7 +217,7 @@ document.getElementById('accountSelectConfirm').addEventListener('click', async 
     const listings = document.getElementsByClassName('accountListing')
     for(let i=0; i<listings.length; i++){
         if(listings[i].hasAttribute('selected')){
-            const authAcc = ConfigManager.setSelectedAccount(listings[i].getAttribute('uuid'))
+            const authAcc = ConfigManager.setSelectedAccount(listings[i].getAttribute('clientToken'))
             ConfigManager.save()
             updateSelectedAccount(authAcc)
             if(getCurrentView() === VIEWS.settings) {
@@ -216,7 +230,7 @@ document.getElementById('accountSelectConfirm').addEventListener('click', async 
     }
     // None are selected? Not possible right? Meh, handle it.
     if(listings.length > 0){
-        const authAcc = ConfigManager.setSelectedAccount(listings[0].getAttribute('uuid'))
+        const authAcc = ConfigManager.setSelectedAccount(listings[0].getAttribute('clientToken'))
         ConfigManager.save()
         updateSelectedAccount(authAcc)
         if(getCurrentView() === VIEWS.settings) {
@@ -271,7 +285,7 @@ async function setAccountListingHandlers(){
         val.onclick = async e => {
             // popup mode
             if(overlayContainer.hasAttribute('popup')){
-                const authAcc = ConfigManager.setSelectedAccount(val.getAttribute('uuid'))
+                const authAcc = ConfigManager.setSelectedAccount(val.getAttribute('clientToken'))
                 ConfigManager.save()
                 updateSelectedAccount(authAcc)
                 if(getCurrentView() === VIEWS.settings) {
@@ -342,7 +356,7 @@ function populateAccountListings(){
     authKeys.forEach((val) => {
         const acc = authAccounts[val]
 
-        const mojang = `<button class="accountListing" uuid="${acc.uuid}" ${!val && !overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
+        const mojang = `<button class="accountListing" uuid="${acc.uuid}" clientToken="${acc.clientToken}" ${!val && !overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
         <img src="https://nmsr.lsmp.site/face/${acc.uuid}?width=45">
         <div class="accountListingName">${acc.displayName}</div>
     </button>`
@@ -364,6 +378,28 @@ function populateAccountListings(){
     mojangAccountSelectListScrollable.innerHTML = mojangAuthAccountStr
 }
 
+function populateProfilesListing() {
+    const accountProfileList = ConfigManager.getSelectedAccount();
+    const availableProfiles = accountProfileList.availableProfiles;
+
+    console.log("Auth Accounts:", accountProfileList);
+    console.log("Available Profiles:", availableProfiles);
+
+    let mojangAuthAccountStr = '';
+
+    // Itera directamente sobre los perfiles en availableProfiles
+    availableProfiles.forEach((profile) => {
+        const mojang = `<button class="accountListing" uuid="${profile.id}" ${!overlayContainer.hasAttribute("popup") ? 'selected' : ''}>
+            <img src="https://nmsr.lsmp.site/face/${profile.id}?width=45">
+            <div class="accountListingName">${profile.name}</div>
+        </button>`;
+
+        mojangAuthAccountStr += mojang;
+    });
+
+    mojangAccountSelectListScrollable.innerHTML = mojangAuthAccountStr;
+}
+
 async function prepareServerSelectionList(){
     await populateServerListings()
     await setServerListingHandlers()
@@ -371,5 +407,10 @@ async function prepareServerSelectionList(){
 
 async function prepareAccountSelectionList(){
     populateAccountListings()
+    await setAccountListingHandlers()
+}
+
+async function prepareProfilesList(){
+    populateProfilesListing()
     await setAccountListingHandlers()
 }

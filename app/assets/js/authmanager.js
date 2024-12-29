@@ -146,16 +146,12 @@ function mojangErrorDisplayable(errorCode) {
  */
 exports.addMojangAccount = async function(username, password) {
     try {
-        const response = await MojangRestAPI.authenticate(username, password, ConfigManager.getClientToken())
+        const response = await MojangRestAPI.authenticate(username, password, ConfigManager.generateClientToken())
         console.log(response)
         if(response.responseStatus === RestResponseStatus.SUCCESS) {
-
             const session = response.data
             if(session.selectedProfile != null){
-                const ret = ConfigManager.addMojangAuthAccount(session.selectedProfile.id, session.accessToken, username, session.selectedProfile.name)
-                if(ConfigManager.getClientToken() == null){
-                    ConfigManager.setClientToken(session.clientToken)
-                }
+                const ret = ConfigManager.addMojangAuthAccount(session.selectedProfile.id, session.user.id, session.accessToken, session.clientToken, username, session.selectedProfile.name, session.availableProfiles)
                 ConfigManager.save()
                 return ret
             } else {
@@ -278,12 +274,12 @@ exports.addMicrosoftAccount = async function(authCode) {
  * @param {string} uuid The UUID of the account to be removed.
  * @returns {Promise.<void>} Promise which resolves to void when the action is complete.
  */
-exports.removeMojangAccount = async function(uuid){
+exports.removeMojangAccount = async function(clientToken){
     try {
-        const authAcc = ConfigManager.getAuthAccount(uuid)
-        const response = await MojangRestAPI.invalidate(authAcc.accessToken, ConfigManager.getClientToken())
+        const authAcc = ConfigManager.getAuthAccount(clientToken)
+        const response = await MojangRestAPI.invalidate(authAcc.accessToken, authAcc.clientToken)
         if(response.responseStatus === RestResponseStatus.SUCCESS) {
-            ConfigManager.removeAuthAccount(uuid)
+            ConfigManager.removeAuthAccount(clientToken)
             ConfigManager.save()
             return Promise.resolve()
         } else {
@@ -324,15 +320,15 @@ exports.removeMicrosoftAccount = async function(uuid){
  */
 async function validateSelectedMojangAccount(){
     const current = ConfigManager.getSelectedAccount()
-    const response = await MojangRestAPI.validate(current.accessToken, ConfigManager.getClientToken())
+    const response = await MojangRestAPI.validate(current.accessToken, current.clientToken)
 
     if(response.responseStatus === RestResponseStatus.SUCCESS) {
         const isValid = response.data
         if(!isValid){
-            const refreshResponse = await MojangRestAPI.refresh(current.accessToken, ConfigManager.getClientToken())
+            const refreshResponse = await MojangRestAPI.refresh(current.accessToken, current.clientToken, current.uuid, current.username)
             if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
                 const session = refreshResponse.data
-                ConfigManager.updateMojangAuthAccount(current.uuid, session.accessToken)
+                ConfigManager.updateMojangAuthAccount(current.clientToken, session.accessToken, session.availableProfiles, session.selectedProfile.name)
                 ConfigManager.save()
             } else {
                 log.error('Error while validating selected profile:', refreshResponse.error)

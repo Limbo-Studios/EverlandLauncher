@@ -5,7 +5,6 @@
 // Requirements
 const path          = require('path')
 const { Type }      = require('helios-distribution-types')
-
 const AuthManager   = require('./assets/js/authmanager')
 const ConfigManager = require('./assets/js/configmanager')
 const { DistroAPI } = require('./assets/js/distromanager')
@@ -328,7 +327,7 @@ async function validateSelectedAccount(){
     if(selectedAcc != null){
         const val = await AuthManager.validateSelected()
         if(!val){
-            ConfigManager.removeAuthAccount(selectedAcc.uuid)
+            ConfigManager.removeAuthAccount(selectedAcc.clientToken)
             ConfigManager.save()
             const accLen = Object.keys(ConfigManager.getAuthAccounts()).length
             setOverlayContent(
@@ -369,7 +368,7 @@ async function validateSelectedAccount(){
                                 selectedAcc.microsoft.expires_at
                             )
                         } else {
-                            ConfigManager.addMojangAuthAccount(selectedAcc.uuid, selectedAcc.accessToken, selectedAcc.username, selectedAcc.displayName)
+                            ConfigManager.addMojangAuthAccount(selectedAcc.uuid, selectedAcc.accountID, selectedAcc.accessToken, selectedAcc.clientToken, selectedAcc.username, selectedAcc.displayName, selectedAcc.availableProfiles)
                         }
                         ConfigManager.save()
                         validateSelectedAccount()
@@ -390,9 +389,12 @@ async function validateSelectedAccount(){
                     })
                 } else {
                     const accountsObj = ConfigManager.getAuthAccounts()
+                    
+                    logger.info("accountsObj:", accountsObj);
                     const accounts = Array.from(Object.keys(accountsObj), v => accountsObj[v])
+                    logger.info("accounts:", accounts);
                     // This function validates the account switch.
-                    setSelectedAccount(accounts[0].uuid)
+                    setSelectedAccount(accounts[0].clientToken)
                     toggleOverlay(false)
                 }
             })
@@ -411,8 +413,8 @@ async function validateSelectedAccount(){
  * 
  * @param {string} uuid The UUID of the account.
  */
-function setSelectedAccount(uuid){
-    const authAcc = ConfigManager.setSelectedAccount(uuid)
+function setSelectedAccount(clientToken){
+    const authAcc = ConfigManager.setSelectedAccount(clientToken)
     ConfigManager.save()
     updateSelectedAccount(authAcc)
     validateSelectedAccount()
