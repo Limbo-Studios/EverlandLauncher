@@ -421,6 +421,18 @@ exports.addMojangAuthAccount = function(uuid, accountID, accessToken, clientToke
     return config.authenticationDatabase[clientToken]
 }
 
+exports.addTempMojangAuthAccount = function(accountID, accessToken, clientToken, availableProfiles){
+    config.selectedAccount = clientToken
+    config.authenticationDatabase[clientToken] = {
+        type: 'mojang',
+        accessToken,
+        clientToken,
+        accountID,
+        availableProfiles
+    }
+    return config.authenticationDatabase[clientToken]
+}
+
 /**
  * Update the tokens of an authenticated microsoft account.
  * 

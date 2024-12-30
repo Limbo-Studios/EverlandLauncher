@@ -155,7 +155,14 @@ exports.addMojangAccount = async function(username, password) {
                 ConfigManager.save()
                 return ret
             } else {
-                return Promise.reject(mojangErrorDisplayable(MojangErrorCode.ERROR_NOT_PAID))
+                if(session.availableProfiles != null){
+                    const ret = ConfigManager.addTempMojangAuthAccount( session.user.id, session.accessToken, session.clientToken, session.availableProfiles)
+                    ConfigManager.save()
+                    ProfileSelector()
+                    return ret
+                } else {
+                    return Promise.reject(mojangErrorDisplayable(MojangErrorCode.ERROR_NOT_PAID))
+                }
             }
 
         } else {
@@ -166,6 +173,11 @@ exports.addMojangAccount = async function(username, password) {
         log.error(err)
         return Promise.reject(mojangErrorDisplayable(MojangErrorCode.UNKNOWN))
     }
+}
+
+
+async function ProfileSelector() {
+    await toggleProfileSwitch(true, true)
 }
 
 const AUTH_MODE = { FULL: 0, MS_REFRESH: 1, MC_REFRESH: 2 }

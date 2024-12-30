@@ -89,9 +89,9 @@ async function showMainUI(data){
             } else {
                 loginOptionsCancelEnabled(false)
                 loginOptionsViewOnLoginSuccess = VIEWS.landing
-                loginOptionsViewOnLoginCancel = VIEWS.loginOptions
-                currentView = VIEWS.loginOptions
-                $(VIEWS.loginOptions).fadeIn(1000)
+                loginOptionsViewOnLoginCancel = VIEWS.login
+                currentView = VIEWS.login
+                $(VIEWS.login).fadeIn(1000)
             }
         }
 
@@ -352,7 +352,7 @@ async function validateSelectedAccount(){
                 }
                 
                 loginOptionsViewOnLoginSuccess = getCurrentView()
-                loginOptionsViewOnLoginCancel = VIEWS.loginOptions
+                loginOptionsViewOnLoginCancel = VIEWS.login
 
                 if(accLen > 0) {
                     loginOptionsViewOnCancel = getCurrentView()
@@ -378,7 +378,7 @@ async function validateSelectedAccount(){
                     loginOptionsCancelEnabled(false)
                 }
                 toggleOverlay(false)
-                switchView(getCurrentView(), VIEWS.loginOptions)
+                switchView(getCurrentView(), VIEWS.login)
             })
             setDismissHandler(async () => {
                 if(accLen > 1){
