@@ -299,7 +299,7 @@ close = "Cerrar"
 walk = "Caminar"
 run = "Correr"
 rotate = "Rotar"
-confirmUpload = "Confirmar y Subirssdfsd"
+confirmUpload = "Confirmar y Subir"
 
 [js.settings.dropinMods]
 removeButton = "Remover"
