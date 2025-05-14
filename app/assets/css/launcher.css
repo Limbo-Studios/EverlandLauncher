@@ -22,6 +22,15 @@
     src: url('../fonts/Ringbearer.ttf');
 }
 
+/* Utility classes for fonts */
+.avenir-book {
+    font-family: 'Avenir Book';
+}
+
+.avenir-medium {
+    font-family: 'Avenir Medium';
+}
+
 /*******************************************************************************
  *                                                                             *
  * Element Styles                                                              *
@@ -1811,6 +1820,38 @@ input:checked+.toggleSwitchSlider:before {
     opacity: 1;
 }
 
+/* Botón de administrar texturas para cuenta seleccionada */
+.settingsAuthAccountTextureManager {
+    opacity: 0;
+    border: 1px solid rgb(72, 176, 247);
+    color: rgb(72, 176, 247);
+    background: none;
+    font-size: 12px;
+    border-radius: 3px;
+    font-family: 'Avenir Medium';
+    transition: 0.25s ease;
+    cursor: pointer;
+    outline: none;
+    margin-top: 10px;
+}
+
+.settingsAuthAccountTextureManager:hover,
+.settingsAuthAccountTextureManager:focus {
+    box-shadow: 0px 0px 20px rgb(72, 176, 247);
+    background: rgba(72, 176, 247, 0.25);
+}
+
+.settingsAuthAccountTextureManager:active {
+    box-shadow: 0px 0px 20px rgb(41, 128, 185);
+    background: rgba(41, 128, 185, 0.25);
+    border: 1px solid rgb(41, 128, 185);
+    color: rgb(41, 128, 185);
+}
+
+.settingsAuthAccount:hover .settingsAuthAccountTextureManager {
+    opacity: 1;
+}
+
 /* * *
 * Settings View (Minecraft Tab)
 * * */
@@ -3259,9 +3300,9 @@ input:checked+.toggleSwitchSlider:before {
     letter-spacing: 1px;
     text-shadow: 0px 0px 20px black;
     position: absolute;
-    bottom: -25px; /* Ajuste conforme necessário */
-    left: 50%; /* Posiciona o texto centralizado horizontalmente */
-    transform: translateX(-50%); /* Ajuste para centralizar o texto */
+    bottom: -25px; /* Ajuste conforme necesario */
+    left: 50%; /* Posiciona el texto centralizado horizontalmente */
+    transform: translateX(-50%); /* Ajuste para centralizar el texto */
     -webkit-user-select: initial;
     text-align: center;
 }
@@ -4307,6 +4348,190 @@ input:checked+.toggleSwitchSlider:before {
     color: rgba(165, 165, 165, 0.75);
 }
 
+/* * *
+* Overlay View (Profile Selection Content)
+* * */
+
+/* Profile selection content container. */
+#profileSelectContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 75%;
+}
+
+/* Profile selection header. */
+#profileSelectHeader {
+    font-family: 'Avenir Medium';
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 25px;
+}
+
+/* Wrapper div for the list of available profiles. */
+#profileSelectList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 65%;
+    min-height: 40%;
+}
+
+/* Scrollable div which lists the available profiles. */
+#profileSelectListScrollable {
+    padding: 0px 5px;
+    overflow-y: scroll;
+}
+
+#profileSelectListScrollable::-webkit-scrollbar {
+    width: 2px;
+}
+
+#profileSelectListScrollable::-webkit-scrollbar-track {
+    display: none;
+}
+
+#profileSelectListScrollable::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.50);
+}
+
+.profileListing {
+    color: white;
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    padding: 5px 10px;
+    width: 200px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    opacity: 0.6;
+    transition: 0.25s ease;
+    cursor: pointer;
+    position: relative;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.profileListing[selected] {
+    cursor: default;
+    opacity: 1.0;
+    background: rgba(31, 140, 11, 0.25);
+    border-color: rgba(31, 140, 11, 0.6);
+}
+
+.profileListing:hover,
+.profileListing:focus {
+    outline: none;
+    opacity: 1.0;
+}
+
+/* Profile avatar container */
+.profileAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background-color: #222;
+    margin-right: 10px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.profileListingDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.profileListingName {
+    font-family: 'Avenir Medium';
+    font-size: 14px;
+}
+
+.profileListingUUID {
+    font-family: 'Avenir Book';
+    font-size: 10px;
+    color: #999;
+}
+
+/* Add spacing between profile listings. */
+#profileSelectListScrollable>.profileListing:not(:first-child):not(:last-child) {
+    margin: 5px 0px;
+}
+
+#profileSelectListScrollable>.profileListing:first-child {
+    margin-bottom: 5px;
+}
+
+#profileSelectListScrollable>.profileListing:last-child {
+    margin-top: 5px;
+}
+
+/* Profile selection content container actions. */
+#profileSelectActions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+}
+
+/* Profile selection confirm button styles. */
+#profileSelectConfirm {
+    background: none;
+    border: 1px solid #ffffff;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-weight: bold;
+    border-radius: 2px;
+    padding: 0px 8.1px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    min-height: 20.67px;
+}
+
+#profileSelectConfirm:hover,
+#profileSelectConfirm:focus {
+    box-shadow: 0px 0px 10px 0px #fff;
+    outline: none;
+}
+
+#profileSelectConfirm:active {
+    border-color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+#profileSelectConfirm:disabled {
+    opacity: 0.6;
+    cursor: default;
+    box-shadow: none;
+}
+
+/* Profile selection cancel button styles. */
+#profileSelectCancel {
+    font-weight: bold;
+    font-size: 10px;
+    text-decoration: none;
+    padding-top: 2.5px;
+    color: rgba(202, 202, 202, 0.75);
+    transition: 0.25s ease;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+#profileSelectCancel:hover,
+#profileSelectCancel:focus {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+#profileSelectCancel:active {
+    color: rgba(165, 165, 165, 0.75);
+}
+
 /*******************************************************************************
  *                                                                             *
  * Loading Element (app.ejs)                                                   *
@@ -4461,5 +4686,494 @@ input:checked+.toggleSwitchSlider:before {
     50%,
     100% {
         bottom: 100%;
+    }
+}
+
+/* * *
+* Texture Manager Styles
+* * */
+
+#textureManagerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 650px;
+    min-height: 480px;
+    max-height: 80vh;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    border: none;
+    padding: 20px;
+    position: relative;
+}
+
+#textureManagerHeader {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: white;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+#texturePlayerName {
+    font-size: 16px;
+    color: #cad7e1;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#textureManagerContainer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#skinViewerContainer {
+    width: 330px;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+#skinCanvas {
+    width: 100%;
+    height: 330px;
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.25);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.skinViewControls {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.skinViewControl {
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.skinViewControl input {
+    margin-right: 5px;
+}
+
+#textureControlsContainer {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.textureSection {
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.25);
+    border-radius: 3px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.textureSectionHeader {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.textureButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.textureActionButton {
+    color: white;
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    padding: 8px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tooltips para mensajes de estado */
+.textureActionButton[data-status-message]:after {
+    content: attr(data-status-message);
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.textureActionButton[data-status-message]:hover:after {
+    opacity: 1;
+}
+
+/* Estado de carga: efecto de brillo deslizante */
+.btn-status-loading {
+    position: relative;
+}
+
+.btn-status-loading:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent
+    );
+    animation: btn-loading-animation 1.5s infinite;
+}
+
+@keyframes btn-loading-animation {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Estado de éxito: efecto de pulso verde */
+.btn-status-success {
+    border-color: rgba(31, 140, 11, 0.87) !important;
+    background-color: rgba(31, 140, 11, 0.3) !important;
+    animation: btn-success-animation 0.5s;
+}
+
+@keyframes btn-success-animation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Estado de error: efecto de sacudida */
+.btn-status-error {
+    border-color: rgba(200, 30, 30, 0.87) !important;
+    background-color: rgba(200, 30, 30, 0.3) !important;
+    animation: btn-error-animation 0.5s;
+}
+
+@keyframes btn-error-animation {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    20%, 60% {
+        transform: translateX(-5px);
+    }
+    40%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Ocultar el elemento de estado de texto que ya no necesitamos */
+#textureManagerStatus {
+    display: none;
+}
+
+.textureUploadButton {
+    border-color: rgba(31, 140, 11, 0.57);
+    background-color: rgba(31, 140, 11, 0.2);
+    display: inline-block !important;
+    cursor: pointer !important;
+    pointer-events: all !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.textureUploadButton:hover {
+    background-color: rgba(31, 140, 11, 0.3);
+    box-shadow: 0px 0px 10px 0px rgba(31, 140, 11, 0.4);
+}
+
+/* Asegurarse de que el input file tenga eventos de clic habilitados */
+.textureUploadButton input[type="file"] {
+    display: none;
+    pointer-events: none;
+}
+
+/* Mejorar la visualización cuando un botón está activo */
+.textureUploadButton:active {
+    transform: scale(0.98);
+    background-color: rgba(31, 140, 11, 0.4);
+}
+
+.textureDeleteButton {
+    border-color: rgba(200, 30, 30, 0.57);
+    background-color: rgba(200, 30, 30, 0.2);
+}
+
+.textureDeleteButton:hover {
+    background-color: rgba(200, 30, 30, 0.3);
+    box-shadow: 0px 0px 10px 0px rgba(200, 30, 30, 0.4);
+}
+
+.textureActionButton:disabled {
+    opacity: 0.5;
+    cursor: default;
+    box-shadow: none;
+}
+
+#textureManagerActions {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#textureManagerClose {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 6px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-size: 12px;
+    margin: 0 auto;
+}
+
+#textureManagerClose:hover,
+#textureManagerClose:focus {
+    box-shadow: 0px 0px 10px 0px #fff;
+    outline: none;
+}
+
+/* Botón de confirmación para subida de texturas */
+.confirmUploadButton {
+    border-color: rgba(0, 123, 255, 0.57) !important;
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    margin-top: 15px !important;
+    width: 100%;
+    opacity: 0.5;
+    transition: 0.25s ease;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto !important;
+}
+
+.confirmUploadButton:enabled {
+    opacity: 1;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.confirmUploadButton:enabled:hover {
+    background-color: rgba(0, 123, 255, 0.4) !important;
+    box-shadow: 0px 0px 10px 0px rgba(0, 123, 255, 0.4);
+}
+
+.confirmUploadButton:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Diálogo de confirmación para eliminar */
+.confirmDialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirmDialogContent {
+    background-color: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 5px;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+.confirmDialogHeader {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.confirmDialogMessage {
+    margin-bottom: 20px;
+    color: #b8b8b8;
+}
+
+.confirmDialogButtons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.dialogButton {
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    background-color: rgba(0, 0, 0, 0.25);
+    color: white;
+    transition: 0.25s ease;
+}
+
+.confirmButton {
+    border-color: rgba(200, 30, 30, 0.57);
+    background-color: rgba(200, 30, 30, 0.2);
+}
+
+.confirmButton:hover {
+    background-color: rgba(200, 30, 30, 0.4);
+    box-shadow: 0px 0px 10px 0px rgba(200, 30, 30, 0.4);
+}
+
+.cancelButton:hover {
+    background-color: rgba(70, 70, 70, 0.4);
+}
+
+/* Estilos para el selector de modelo de skin */
+.textureModelSelector {
+    padding: 5px 0;
+    margin-bottom: 15px;
+    border-bottom: none !important;
+    width: 100% !important;
+}
+
+/* Etiqueta de Steve/Alex para el toggle switch */
+.modelLabel {
+    position: relative;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    margin: 0 10px;
+    transition: 0.25s ease;
+    cursor: pointer;
+    opacity: 0.4;
+}
+
+.modelLabel.active {
+    opacity: 1;
+    text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.7);
+}
+
+/* Mejorar aspecto del switch */
+.modelSelectionSwitch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.modelSelectionSwitch .toggleSwitchSlider {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modelSelectionSwitch input:checked + .toggleSwitchSlider {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Asegurar que el círculo se mueva correctamente */
+.modelSelectionSwitch .toggleSwitchSlider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.75);
+    border-radius: 50px;
+    transition: .4s;
+}
+
+input:checked + .toggleSwitchSlider:before {
+    transform: translateX(15px);
+}
+
+/* Modelo de skin dentro de la sección de skin */
+.modelSelectionContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    #textureManagerContent {
+        width: 95%;
+        max-width: 95%;
+        padding: 15px;
+    }
+    
+    #textureManagerContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    #skinViewerContainer, 
+    #textureControlsContainer {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto 20px auto;
+    }
+    
+    #textureManagerActions {
+        position: relative;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    #textureManagerContent {
+        width: 98%;
+        padding: 10px;
+    }
+    
+    #skinViewerContainer {
+        height: 300px;
+    }
+    
+    #skinCanvas {
+        height: 280px;
+    }
+    
+    .textureSection {
+        padding: 10px;
     }
 }

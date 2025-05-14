@@ -19,8 +19,6 @@ const {
     downloadFile
 }                             = require('limbo-core/dl')
 const {
-    validateSelectedJvm,
-    ensureJavaDirIsRoot,
     javaExecFromRoot,
     discoverBestJvmInstallation,
     latestOpenJDK,
@@ -136,25 +134,43 @@ document.getElementById('settingsMediaButton').onclick = async e => {
 }
 
 // Bind selected account
-function updateSelectedAccount(authUser){
+function updateSelectedAccount(authUser, forceUpdate = false){
     let username = Lang.queryJS('landing.selectedAccount.noAccountSelected')
-    const authAccounts = ConfigManager.getSelectedAccount()
+
+    if(authUser == null) {
+        // Si no se proporciona usuario, obtenemos el actual de ConfigManager
+        authUser = ConfigManager.getSelectedAccount()
+    }
 
     if(authUser != null){
-        const acc = authAccounts
         if(authUser.displayName != null){
             username = authUser.displayName
+            loggerLanding.info('Actualizando nombre en landing:', username)
         }
+        // Actualizar avatar con timestamp para forzar recarga de caché
         if(authUser.uuid != null){
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/face/${authUser.uuid}')`
-        } if (acc.type === 'mojang'){
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/face/${authUser.uuid}')`
-        } else { (acc.Type === 'microsoft')
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.lsmp.site/face/${authUser.uuid}')`
+            const timestamp = Date.now()
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://nmsr.everland.lsmp.tech/face/${authUser.uuid}?t=${timestamp}')`
         }
     }
-    user_text.innerHTML = username
+    
+    // Verificar si necesitamos forzar la actualización comparando con el valor actual
+    const currentDisplayName = user_text.innerHTML
+    if(forceUpdate || currentDisplayName !== username) {
+        loggerLanding.info(`Actualizando UI: ${currentDisplayName} -> ${username} (forzado: ${forceUpdate})`)
+        user_text.innerHTML = username
+    }
 }
+
+// Exponer función para llamadas desde otros archivos
+window.updateSelectedAccountDirect = updateSelectedAccount;
+
+// Añadir un observador para cambios en la cuenta
+document.addEventListener('userDataChanged', (e) => {
+    loggerLanding.info('Evento userDataChanged recibido, actualizando nombre en UI')
+    updateSelectedAccount(null, true) // Forzar actualización desde ConfigManager
+})
+
 updateSelectedAccount(ConfigManager.getSelectedAccount())
 
 // Bind selected server

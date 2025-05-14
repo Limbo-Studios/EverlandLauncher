@@ -104,8 +104,55 @@ async function showMainUI(data){
     }, 750)
     // Disable tabbing to the news container.
     initNews().then(() => {
-        $('#newsContainer *').attr('tabindex', '-1')
     })
+
+    // Iniciar actualización periódica de tokens y actualizar token al iniciar
+    try {
+        const current = ConfigManager.getSelectedAccount()
+        if(current && current.type === 'mojang') {
+            logger.info('Refrescando token al iniciar para cuenta Mojang:', current.displayName)
+            
+            // Guardar nombre anterior para detectar cambios
+            const previousName = current.displayName
+            
+            // Refrescar la sesión usando MojangRestAPI
+            try {
+                const refreshResponse = await MojangRestAPI.refresh(
+                    current.accessToken, 
+                    current.clientToken, 
+                    current.uuid, 
+                    current.username
+                )
+                
+                if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
+                    const session = refreshResponse.data
+                    logger.info(`Token refrescado correctamente al iniciar para ${current.displayName}`)
+                    
+                    // Actualizar cuenta en ConfigManager
+                    ConfigManager.updateMojangAuthAccount(
+                        current.clientToken, 
+                        session.accessToken, 
+                        session.availableProfiles, 
+                        session.selectedProfile.name
+                    )
+                    ConfigManager.save()
+                    
+                    // Comprobar si el nombre ha cambiado y forzar actualización
+                    if(session.selectedProfile.name !== previousName) {
+                        logger.info(`Nombre actualizado al iniciar: ${previousName} -> ${session.selectedProfile.name}`)
+                        
+                        // Obtener cuenta actualizada y forzar actualización en UI
+                        const updatedAccount = ConfigManager.getSelectedAccount()
+                        notifyUserDataChanged(updatedAccount)
+                    }
+                }
+            } catch(err) {
+                logger.error('Error al refrescar token al iniciar:', err)
+            }
+        }
+    } catch(err) {
+        logger.error('Error al actualizar token al iniciar:', err)
+    }
 }
 
 function showFatalStartupError(){
@@ -325,6 +372,46 @@ function mergeModConfiguration(o, n, nReq = false){
 async function validateSelectedAccount(){
     const selectedAcc = ConfigManager.getSelectedAccount()
     if(selectedAcc != null){
+        // Intentar refrescar el token y detectar cambios de nombre
+        try {
+            if(selectedAcc.type === 'mojang') {
+                const refreshResponse = await MojangRestAPI.refresh(
+                    selectedAcc.accessToken, 
+                    selectedAcc.clientToken, 
+                    selectedAcc.uuid, 
+                    selectedAcc.username
+                )
+                
+                if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
+                    const session = refreshResponse.data
+                    
+                    // Guardar nombre anterior para comparar
+                    const previousName = selectedAcc.displayName
+                    
+                    // Actualizar cuenta en ConfigManager
+                    ConfigManager.updateMojangAuthAccount(
+                        selectedAcc.clientToken, 
+                        session.accessToken, 
+                        session.availableProfiles, 
+                        session.selectedProfile.name
+                    )
+                    ConfigManager.save()
+                    
+                    // Comprobar si el nombre ha cambiado y forzar actualización
+                    if(session.selectedProfile.name !== previousName) {
+                        logger.info(`Nombre cambiado durante validación: ${previousName} -> ${session.selectedProfile.name}`)
+                        
+                        // Obtener cuenta actualizada y forzar actualización en UI
+                        const updatedAccount = ConfigManager.getSelectedAccount()
+                        notifyUserDataChanged(updatedAccount)
+                    }
+                }
+            }
+        } catch(err) {
+            logger.warn('Error al refrescar token durante validación:', err)
+        }
+        
+        // Continuar con la validación normal
         const val = await AuthManager.validateSelected()
         if(!val){
             ConfigManager.removeAuthAccount(selectedAcc.clientToken)
@@ -414,10 +501,118 @@ async function validateSelectedAccount(){
  * @param {string} uuid The UUID of the account.
  */
 function setSelectedAccount(clientToken){
+    // Obtener la cuenta seleccionada
     const authAcc = ConfigManager.setSelectedAccount(clientToken)
+    
+    // Guardar configuración inmediatamente
     ConfigManager.save()
-    updateSelectedAccount(authAcc)
-    validateSelectedAccount()
+    
+    // Forzar la actualización de UI después de guardar los cambios
+    updateSelectedAccount(authAcc, true)
+    
+    // Ejecutar validación como proceso posterior
+    setTimeout(() => {
+        validateSelectedAccount()
+    }, 50)
+    
+    return authAcc
+}
+
+/**
+ * Notifica a todas las partes de la aplicación que los datos de usuario han cambiado.
+ * 
+ * @param {Object} account La cuenta actualizada
+ */
+function notifyUserDataChanged(account) {
+    logger.info('Notificando cambio de datos de usuario para:', account?.displayName)
+    
+    // Método 1: Actualizar directamente la vista principal
+    if(window.updateSelectedAccountDirect) {
+        window.updateSelectedAccountDirect(account, true)
+    }
+    
+    // Método 2: Disparar evento para que otros componentes se actualicen
+    document.dispatchEvent(new CustomEvent('userDataChanged', {
+        detail: { account, timestamp: Date.now() }
+    }))
+    
+    // Método 3: Si estamos en una vista específica, actualizar componentes relevantes
+    if(getCurrentView() === VIEWS.settings) {
+        if(typeof refreshAuthAccounts === 'function') {
+            refreshAuthAccounts()
+        }
+    }
+}
+
+/**
+ * Iniciar el intervalo de actualización de nombres de usuario.
+ */
+function startUsernameRefreshInterval() {
+    // Configurar el nuevo intervalo
+    usernameRefreshInterval = setInterval(async () => {
+        try {
+            const current = ConfigManager.getSelectedAccount()
+            if(current && current.type === 'mojang') {
+                logger.info('Refrescando token para cuenta Mojang:', current.displayName)
+                
+                try {
+                    // Guardar nombre anterior para detectar cambios
+                    const previousName = current.displayName
+                    
+                    // Refrescar la sesión usando MojangRestAPI
+                    const refreshResponse = await MojangRestAPI.refresh(
+                        current.accessToken, 
+                        current.clientToken, 
+                        current.uuid, 
+                        current.username
+                    )
+                    
+                    if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
+                        const session = refreshResponse.data
+                        logger.info(`Token refrescado correctamente para ${current.displayName}`)
+                        
+                        // Actualizar cuenta en ConfigManager
+                        ConfigManager.updateMojangAuthAccount(
+                            current.clientToken, 
+                            session.accessToken, 
+                            session.availableProfiles, 
+                            session.selectedProfile.name
+                        )
+                        ConfigManager.save()
+                        
+                        // Comprobar si el nombre ha cambiado y forzar actualización
+                        if(session.selectedProfile.name !== previousName) {
+                            logger.info(`Nombre actualizado: ${previousName} -> ${session.selectedProfile.name}`)
+                            
+                            // Obtener cuenta actualizada y forzar actualización en UI
+                            const updatedAccount = ConfigManager.getSelectedAccount()
+                            notifyUserDataChanged(updatedAccount)
+                        }
+                    } else {
+                        logger.warn('Respuesta de refresco de token sin éxito:', refreshResponse.responseStatus)
+                    }
+                } catch(err) {
+                    logger.error('Error al refrescar token:', err)
+                }
+            }
+        } catch(err) {
+            logger.warn('Error en actualización periódica de token:', err)
+        }
+    }, USERNAME_REFRESH_INTERVAL)
+}
+
+// Registrar el manejador de Mojang para usarlo desde la interfaz
+// Esto expondrá las funciones de MojangRestAPI
+window.mojangHandler = {
+    uploadSkin: (accessToken, model, uuid, skinPath) => {
+        return MojangRestAPI.uploadSkin(accessToken, model, uuid, skinPath)
+    },
+    uploadCape: (accessToken, uuid, capePath) => {
+        return MojangRestAPI.uploadCape(accessToken, uuid, capePath)
+    },
+    deleteTexture: (accessToken, uuid, textureType) => {
+        return MojangRestAPI.deleteTexture(accessToken, uuid, textureType)
+    }
 }
 
 // Synchronous Listener

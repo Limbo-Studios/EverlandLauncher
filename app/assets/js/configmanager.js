@@ -10,7 +10,7 @@ const logger = LoggerUtil.getLogger('ConfigManager')
 
 const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME)
 
-const nameDataPath = '.limbostudios'
+const nameDataPath = '.everland'
 
 const dataPath = path.join(sysRoot, nameDataPath)
 
@@ -49,14 +49,14 @@ exports.getDataDirectory = function(def = false){
  * Reloads the account name because using a custom authserver 
  * won't do automatically the job, thanks to Ulysse2211
  * 
- */
+
 async function reloadUsername() {
     const authAccounts = exports.getSelectedAccount();
     const acc = authAccounts;
 
     if (acc && acc.type === 'mojang') {
         const gg = exports.getSelectedAccount();
-        let response = await fetch(`https://auth.lsmp.site/api/yggdrasil/sessionserver/session/minecraft/profile/${gg['uuid']}`);
+        let response = await fetch(`https://minecraft.everland.lsmp.tech/api/yggdrasil/sessionserver/session/minecraft/profile/${gg['uuid']}`);
         response = await response.json();
         exports.updateMojangUserProfile(gg['clientToken'], response['name']);
         exports.save()
@@ -119,7 +119,7 @@ const DEFAULT_CONFIG = {
             SyncLanguage: true
         },
         launcher: {
-            language: 'en_US',
+            language: 'es_mx',
             allowPrerelease: false,
             dataDirectory: dataPath
         }
@@ -312,12 +312,23 @@ exports.getClientToken = function(){
 }*/
 
 /**
- * Genera una UUID v4 sin guiones.
- * @returns {string} La UUID generada sin guiones.
+ * Genera una UUID v4 sin guiones, añadiendo un timestamp para garantizar unicidad absoluta
+ * incluso si se llama múltiples veces en milisegundos.
+ * 
+ * @returns {string} La UUID generada sin guiones con timestamp para unicidad.
  */
-
- exports.generateClientToken = function() {
-    return uuidv4().replace(/-/g, '');
+exports.generateClientToken = function() {
+    // Obtenemos el timestamp actual en milisegundos para garantizar unicidad
+    const timestamp = Date.now();
+    // Generamos un valor aleatorio adicional (0-999) para mayor unicidad
+    const random = Math.floor(Math.random() * 1000);
+    // Generamos la UUID base
+    const uuid = uuidv4().replace(/-/g, '');
+    // Combinamos UUID con timestamp y valor aleatorio, y tomamos los primeros 32 caracteres
+    // para mantener la longitud de UUID estándar sin guiones
+    const uniqueToken = (uuid + timestamp + random).substring(0, 32);
+    
+    return uniqueToken;
 }
 
 /**
@@ -365,20 +376,69 @@ exports.getAuthAccount = function(clientToken){
 }
 
 /**
- * Update the access token of an authenticated mojang account.
+ * Add a new mojang auth account to the database.
  * 
- * @param {string} uuid The uuid of the authenticated account.
- * @param {string} accessToken The new Access Token.
- * 
- * @returns {Object} The authenticated account object created by this action.
+ * @param {string} clientToken The mojang client token.
+ * @param {string} accessToken The mojang access token.
+ * @param {string} uuid The player's uuid.
+ * @param {string} username The player's username.
+ * @param {Array} availableProfiles Optional. Array of available profiles.
  */
-exports.updateMojangAuthAccount = function(clientToken, accessToken, availableProfiles, username){
-    config.authenticationDatabase[clientToken].accessToken = accessToken
-    config.authenticationDatabase[clientToken].availableProfiles = availableProfiles
-    config.authenticationDatabase[clientToken].username = username
-    config.authenticationDatabase[clientToken].displayName = username
-    config.authenticationDatabase[clientToken].type = 'mojang' // For gradual conversion.
-    return config.authenticationDatabase[clientToken]
+exports.addMojangAuthAccount = function(clientToken, accessToken, uuid, username, availableProfiles) {
+    const authAcc = {
+        type: 'mojang',
+        clientToken,
+        accessToken,
+        uuid,
+        displayName: username,
+        username: username,
+        availableProfiles: availableProfiles || [] // Store available profiles
+    }
+    
+    config.authenticationDatabase[uuid] = authAcc
+    config.selectedAccount = uuid
+}
+
+/**
+ * Update a mojang auth account.
+ * 
+ * @param {string} clientToken The mojang client token.
+ * @param {string} accessToken The mojang access token.
+ * @param {Array} availableProfiles Optional. Array of available profiles.
+ * @param {string} selectedProfileName Optional. The selected profile name.
+ */
+exports.updateMojangAuthAccount = function(clientToken, accessToken, availableProfiles, selectedProfileName) {
+    const authAcc = exports.getMojangAuthAccount(clientToken)
+    if (authAcc != null) {
+        authAcc.accessToken = accessToken
+        if (availableProfiles) {
+            authAcc.availableProfiles = availableProfiles
+        }
+        if (selectedProfileName) {
+            authAcc.displayName = selectedProfileName
+            authAcc.username = selectedProfileName
+        }
+    }
+}
+
+/**
+ * Update the mojang account's properties.
+ * 
+ * @param {string} clientToken The account's client token.
+ * @param {string} accessToken The account's access token.
+ * @param {Array.<Object>} availableProfiles Array of available profile objects.
+ * @param {string} selectedProfile New display name (username).
+ */
+exports.updateMojangAuthAccount = function(clientToken, accessToken, availableProfiles, selectedProfile) {
+    const authAccounts = config.authenticationDatabase
+    const account = authAccounts[clientToken]
+    if (account != null) {
+        account.accessToken = accessToken
+        account.availableProfiles = availableProfiles
+        if (selectedProfile) {
+            account.displayName = selectedProfile
+        }
+    }
 }
 
 /**
@@ -532,7 +592,7 @@ exports.setSelectedAccount = function(clientToken){
     if(authAcc != null) {
         config.selectedAccount = clientToken
     }
-    reloadUsername()
+//    reloadUsername()
 
     return authAcc
 }
@@ -923,7 +983,7 @@ exports.setLanguage = function(lang){
 
 // This exports the reloadUsername function for use in preloader
 
-exports.reloadUsername = reloadUsername
+//exports.reloadUsername = reloadUsername
 
 /**
  * Get the list of all available languages

@@ -53,7 +53,7 @@ if(!isDev){
                 loggerAutoUpdater.info('New update available', info.version)
                 
                 if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/Limbo-Studios/LimboLauncher/releases/download/v${info.version}/Limbo-Launcher-setup.dmg`
+                    info.darwindownload = `https://github.com/Limbo-Studios/EverlandLauncher/releases/download/v${info.version}/Everland-Launcher-setup.dmg`
                     showUpdateUI(info)
                 }
                 
@@ -130,6 +130,30 @@ function showUpdateUI(info){
             settingsNavItemListener(document.getElementById('settingsNavUpdate'), false)
         })
     }
+}
+
+/**
+ * Switch views.
+ * 
+ * @param {string} current The ID of the current view container.
+ * @param {string} next The ID of the next view container.
+ * @param {number} currentFadeTime Optional. The fade out time for the current view.
+ * @param {number} nextFadeTime Optional. The fade in time for the next view.
+ * @param {Function} onCurrentFade Optional. Callback function to execute when the current
+ * view fades out.
+ * @param {Function} onNextFade Optional. Callback function to execute when the next view
+ * fades in.
+ */
+function switchView(current, next, currentFadeTime = 500, nextFadeTime = 500, onCurrentFade = () => {}, onNextFade = () => {}) {
+    currentView = next
+    $(`#${current}`).fadeOut(currentFadeTime, () => {
+        onCurrentFade()
+        $(`#${next}`).fadeIn(nextFadeTime, () => {
+            onNextFade()
+            // Disparar evento ViewShown para notificar que la vista se ha mostrado
+            document.dispatchEvent(new CustomEvent('ViewShown', { detail: next }));
+        })
+    })
 }
 
 /* jQuery Example

@@ -4,20 +4,23 @@ const path  = require('path')
 const toml  = require('toml')
 const merge = require('lodash.merge')
 
-const defaultLang = "en_US"
+const defaultLang = "es_MX"
 let config = null
 
 let lang
 exports.loadLanguage = function(id){
-    if(isDev){
-        lang = merge(lang || {}, toml.parse(fs.readFileSync(path.join(process.cwd(), 'lang', `${id}.toml`))) || {})
-    } else {
-        if(process.platform === 'darwin'){
-            lang = merge(lang || {}, toml.parse(fs.readFileSync(path.join(process.cwd(), 'Content', 'Resources', 'lang', `${id}.toml`))) || {})
-    } else {
-        lang = merge(lang || {}, toml.parse(fs.readFileSync(path.join(process.cwd(), 'resources', 'lang', `${id}.toml`))) || {})
-}
-}
+    // Nueva implementación: siempre cargar desde app/assets/lang
+    const langPath = path.join(__dirname, '..', 'lang', `${id}.toml`)
+    try {
+        lang = merge(lang || {}, toml.parse(fs.readFileSync(langPath)) || {})
+    } catch (err) {
+        console.error(`Error al cargar el archivo de idioma: ${langPath}`, err)
+        // Intentar cargar el idioma predeterminado si falla la carga del idioma solicitado
+        if (id !== defaultLang) {
+            console.info(`Intentando cargar el idioma predeterminado: ${defaultLang}`)
+            this.loadLanguage(defaultLang)
+        }
+    }
 }
 
 exports.query = function(id, placeHolders){

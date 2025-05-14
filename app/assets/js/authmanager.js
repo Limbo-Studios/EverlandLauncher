@@ -16,6 +16,7 @@ const { MojangRestAPI, MojangErrorCode } = require('limbo-core/mojang')
 const { MicrosoftAuth, MicrosoftErrorCode } = require('limbo-core/microsoft')
 const { AZURE_CLIENT_ID }    = require('./ipcconstants')
 const Lang = require('./langloader')
+const { ipcRenderer } = require('electron')
 
 const log = LoggerUtil.getLogger('AuthManager')
 
@@ -136,9 +137,45 @@ function mojangErrorDisplayable(errorCode) {
 // Functions
 
 /**
- * Add a Mojang account. This will authenticate the given credentials with Mojang's
- * authserver. The resultant data will be stored as an auth account in the
- * configuration database.
+ * Verifica si un perfil de Minecraft ya está registrado en la base de datos.
+ * 
+ * @param {string} uuid El UUID del perfil a verificar.
+ * @returns {boolean} True si el perfil ya está registrado, false en caso contrario.
+ */
+exports.isProfileRegistered = function(uuid) {
+    const authAccounts = ConfigManager.getAuthAccounts()
+    
+    // Buscar en todas las cuentas registradas
+    for (const accountId in authAccounts) {
+        const account = authAccounts[accountId]
+        
+        // Comprobar si el UUID del perfil coincide con alguna cuenta registrada
+        if (account.uuid === uuid) {
+            return true
+        }
+    }
+    
+    return false
+}
+
+/**
+ * Filtra los perfiles disponibles para mostrar solo los que no están registrados.
+ * 
+ * @param {Array} availableProfiles Lista de perfiles disponibles de una cuenta.
+ * @returns {Array} Lista de perfiles que aún no están registrados.
+ */
+exports.filterRegisteredProfiles = function(availableProfiles) {
+    if (!availableProfiles || !Array.isArray(availableProfiles)) {
+        return []
+    }
+    
+    return availableProfiles.filter(profile => !exports.isProfileRegistered(profile.id))
+}
+
+/**
+ * Add a Mojang account. This will authenticate the given credentials against
+ * the Mojang auth server. On successful authentication, the account will be
+ * saved to the authorization database.
  * 
  * @param {string} username The account username (email if migrated).
  * @param {string} password The account password.
@@ -146,35 +183,176 @@ function mojangErrorDisplayable(errorCode) {
  */
 exports.addMojangAccount = async function(username, password) {
     try {
-        const response = await MojangRestAPI.authenticate(username, password, ConfigManager.generateClientToken())
-        console.log(response)
-        if(response.responseStatus === RestResponseStatus.SUCCESS) {
-            const session = response.data
-            if(session.selectedProfile != null){
-                const ret = ConfigManager.addMojangAuthAccount(session.selectedProfile.id, session.user.id, session.accessToken, session.clientToken, username, session.selectedProfile.name, session.availableProfiles)
-                ConfigManager.save()
-                return ret
-            } else {
-                if(session.availableProfiles != null){
-                    const ret = ConfigManager.addTempMojangAuthAccount( session.user.id, session.accessToken, session.clientToken, session.availableProfiles)
-                    ConfigManager.save()
-                    ProfileSelector()
-                    return ret
-                } else {
-                    return Promise.reject(mojangErrorDisplayable(MojangErrorCode.ERROR_NOT_PAID))
-                }
-            }
+        // Siempre generamos un nuevo clientToken para cada autenticación 
+        // Para garantizar que nunca se repita
+        const clientToken = ConfigManager.generateClientToken()
+        log.info('Generando nuevo clientToken para autenticación:', clientToken.substring(0, 6) + '...')
+        
+        const response = await MojangRestAPI.authenticate(username, password, clientToken)
+        const session = response.data
 
-        } else {
-            return Promise.reject(mojangErrorDisplayable(response.mojangErrorCode))
+        if (session.selectedProfile == null) {
+            if (session.availableProfiles && session.availableProfiles.length > 0) {
+                // Filtrar perfiles ya registrados
+                const newProfiles = exports.filterRegisteredProfiles(session.availableProfiles)
+                
+                // Si no hay perfiles nuevos para registrar
+                if (newProfiles.length === 0) {
+                    // Invalidar el token y notificar al usuario
+                    try {
+                        await exports.invalidateMojangToken(session.accessToken, session.clientToken, 'all_profiles_registered')
+                        log.info('Token invalidado porque todos los perfiles ya están registrados')
+                    } catch (err) {
+                        log.warn('Error al invalidar token con perfiles ya registrados:', err)
+                    }
+                    
+                    throw new Error('all_profiles_registered')
+                }
+                
+                // Si solo queda un perfil disponible, seleccionarlo automáticamente
+                if (newProfiles.length === 1) {
+                    log.info('Solo un perfil disponible, seleccionando automáticamente:', newProfiles[0].name)
+                    
+                    try {
+                        // Refrescar el token con el perfil seleccionado
+                        const refreshResponse = await MojangRestAPI.refresh(
+                            session.accessToken, 
+                            session.clientToken,
+                            newProfiles[0].id, 
+                            newProfiles[0].name
+                        )
+                        
+                        const refreshedSession = refreshResponse.data
+                        
+                        // Añadir la cuenta con el perfil seleccionado
+                        const ret = ConfigManager.addMojangAuthAccount(
+                            refreshedSession.selectedProfile.id,
+                            refreshedSession.selectedProfile.id,
+                            refreshedSession.accessToken,
+                            refreshedSession.clientToken,
+                            username,
+                            refreshedSession.selectedProfile.name,
+                            session.availableProfiles
+                        )
+                        return ret
+                    } catch (err) {
+                        log.error('Error al refrescar token con perfil único:', err)
+                        // Si falla el refresco, seguimos con el flujo normal de selección
+                    }
+                }
+                
+                // Si hay múltiples perfiles o falló la selección automática, mostrar selector
+                return {
+                    clientToken: session.clientToken,
+                    accessToken: session.accessToken,
+                    availableProfiles: newProfiles,
+                    originalProfiles: session.availableProfiles,
+                    requiresProfileSelection: true
+                }
+            } else {
+                // No hay perfiles disponibles
+                throw new Error('No game profiles associated with this account')
+            }
+        }
+
+        // Verificar si el perfil seleccionado ya está registrado
+        if (exports.isProfileRegistered(session.selectedProfile.id)) {
+            // Invalidar el token y notificar al usuario
+            try {
+                await exports.invalidateMojangToken(session.accessToken, session.clientToken, 'profile_already_registered')
+                log.info('Token invalidado porque el perfil seleccionado ya está registrado')
+            } catch (err) {
+                log.warn('Error al invalidar token con perfil ya registrado:', err)
+            }
+            
+            throw new Error('profile_already_registered')
+        }
+
+        const ret = ConfigManager.addMojangAuthAccount(
+            session.selectedProfile.id,
+            session.selectedProfile.id,
+            session.accessToken,
+            session.clientToken,
+            username,
+            session.selectedProfile.name,
+            session.availableProfiles
+        )
+        return ret
+    } catch (err) {
+        if (err.message === 'all_profiles_registered' || err.message === 'profile_already_registered') {
+            return Promise.reject({
+                title: 'Perfiles ya registrados',
+                desc: 'Todos los perfiles de esta cuenta ya están registrados en el launcher.'
+            })
         }
         
-    } catch (err){
-        log.error(err)
-        return Promise.reject(mojangErrorDisplayable(MojangErrorCode.UNKNOWN))
+        return Promise.reject(mojangErrorDisplayable(err))
     }
 }
 
+/**
+ * Select a profile from an account with multiple profiles.
+ * This will refresh the token with the selected profile.
+ * 
+ * @param {string} accessToken The account access token.
+ * @param {string} clientToken The account client token.
+ * @param {string} uuid The selected profile UUID.
+ * @param {string} name The selected profile name.
+ * @returns {Promise.<Object>} Promise which resolves the refreshed account object.
+ */
+exports.selectMojangProfile = async function(accessToken, clientToken, uuid, name) {
+    try {
+        // Generamos un nuevo clientToken para el refresh
+        const newClientToken = ConfigManager.generateClientToken()
+        log.info('Generando nuevo clientToken para refresh:', newClientToken.substring(0, 6) + '...')
+        
+        // Usamos el nuevo token para el refresh
+        const refreshResponse = await MojangRestAPI.refresh(accessToken, clientToken, uuid, name, newClientToken)
+        return refreshResponse.data
+    } catch (err) {
+        return Promise.reject(mojangErrorDisplayable(err))
+    }
+}
+
+/**
+ * Invalidate a specific Mojang access token.
+ * 
+ * @param {string} accessToken The specific access token to invalidate.
+ * @param {string} clientToken The client token associated with the access token.
+ * @param {string} reason The reason for invalidation (optional).
+ * @returns {Promise.<boolean>} Promise which resolves when the token is invalidated.
+ */
+exports.invalidateMojangToken = async function(accessToken, clientToken, reason = 'unspecified') {
+    try {
+        if (!accessToken || !clientToken) {
+            log.warn('Intento de invalidar token sin proporcionar accessToken o clientToken')
+            return Promise.resolve(false)
+        }
+        
+        // Log específico del token que se está invalidando
+        log.info(`Invalidando token específico - Client: ${clientToken.substring(0, 6)}... - Razón: ${reason}`)
+        
+        if (reason === 'unused') {
+            log.info('Token descartado porque no fue utilizado')
+        } else if (reason === 'profile_already_registered') {
+            log.info('Token descartado porque el perfil ya está registrado')
+        } else if (reason === 'all_profiles_registered') {
+            log.info('Token descartado porque todos los perfiles ya están registrados')
+        } else if (reason === 'user_cancelled') {
+            log.info('Token descartado debido a cancelación del usuario')
+        } else {
+            log.info('Descartando token por razón: ' + reason)
+        }
+        
+        await MojangRestAPI.invalidate(accessToken, clientToken)
+        log.info('Token específico invalidado correctamente!')
+        return Promise.resolve(true)
+    } catch (err) {
+        log.warn('Error al invalidar token específico:', err)
+        // Continuamos aunque haya un error, pero devolvemos false para indicar fallo
+        return Promise.resolve(false)
+    }
+}
 
 async function ProfileSelector() {
     await toggleProfileSwitch(true, true)
@@ -280,27 +458,43 @@ exports.addMicrosoftAccount = async function(authCode) {
 }
 
 /**
- * Remove a Mojang account. This will invalidate the access token associated
- * with the account and then remove it from the database.
+ * Log out of a Mojang account. This will invalidate the access token
+ * and remove the account from the database.
  * 
- * @param {string} uuid The UUID of the account to be removed.
- * @returns {Promise.<void>} Promise which resolves to void when the action is complete.
+ * @param {string} clientToken The client token of the account to log out of.
+ * @returns {Promise.<boolean>} Promise which resolves to true if logout was successful.
  */
-exports.removeMojangAccount = async function(clientToken){
+exports.removeMojangAccount = async function(clientToken) {
     try {
         const authAcc = ConfigManager.getAuthAccount(clientToken)
-        const response = await MojangRestAPI.invalidate(authAcc.accessToken, authAcc.clientToken)
-        if(response.responseStatus === RestResponseStatus.SUCCESS) {
-            ConfigManager.removeAuthAccount(clientToken)
-            ConfigManager.save()
-            return Promise.resolve()
-        } else {
-            log.error('Error while removing account', response.error)
-            return Promise.reject(response.error)
+        if (authAcc == null) {
+            return Promise.resolve(false)
         }
-    } catch (err){
-        log.error('Error while removing account', err)
-        return Promise.reject(err)
+
+        try {
+            // Intento de invalidación del token
+            log.info(`Intentando invalidar token para la cuenta ${authAcc.displayName}`)
+            await MojangRestAPI.invalidate(authAcc.accessToken, authAcc.clientToken)
+            log.info(`Token invalidado correctamente para ${authAcc.displayName}`)
+        } catch (err) {
+            // En caso de error en la invalidación, sólo registramos el error
+            log.warn('Error al invalidar token durante el cierre de sesión:', err)
+            log.info('Continuando con la eliminación de la cuenta a pesar del error de invalidación')
+        }
+
+        // Siempre eliminamos la cuenta de la base de datos, incluso si falla la invalidación
+        const removed = ConfigManager.removeAuthAccount(clientToken)
+        if (removed) {
+            ConfigManager.save()
+            log.info(`Cuenta ${authAcc.displayName} eliminada de la base de datos`)
+            return Promise.resolve(true)
+        } else {
+            log.warn(`No se encontró la cuenta ${clientToken} para eliminar`)
+            return Promise.resolve(false)
+        }
+    } catch (err) {
+        log.error('Error desconocido durante el cierre de sesión:', err)
+        return Promise.resolve(false)
     }
 }
 
@@ -332,29 +526,25 @@ exports.removeMicrosoftAccount = async function(uuid){
  */
 async function validateSelectedMojangAccount(){
     const current = ConfigManager.getSelectedAccount()
-    const response = await MojangRestAPI.validate(current.accessToken, current.clientToken)
-
-    if(response.responseStatus === RestResponseStatus.SUCCESS) {
-        const isValid = response.data
-        if(!isValid){
-            const refreshResponse = await MojangRestAPI.refresh(current.accessToken, current.clientToken, current.uuid, current.username)
-            if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
-                const session = refreshResponse.data
-                ConfigManager.updateMojangAuthAccount(current.clientToken, session.accessToken, session.availableProfiles, session.selectedProfile.name)
-                ConfigManager.save()
-            } else {
-                log.error('Error while validating selected profile:', refreshResponse.error)
-                log.info('Account access token is invalid.')
-                return false
-            }
-            log.info('Account access token validated.')
+    
+    try {
+        // Siempre intentamos refrescar el token, independientemente de su validez actual
+        const refreshResponse = await MojangRestAPI.refresh(current.accessToken, current.clientToken, current.uuid, current.username)
+        if(refreshResponse.responseStatus === RestResponseStatus.SUCCESS) {
+            const session = refreshResponse.data
+            ConfigManager.updateMojangAuthAccount(current.clientToken, session.accessToken, session.availableProfiles, session.selectedProfile.name)
+            ConfigManager.save()
+            log.info('Account access token refreshed successfully.')
             return true
         } else {
-            log.info('Account access token validated.')
-            return true
+            log.error('Error while refreshing token:', refreshResponse.error)
+            log.info('Failed to refresh account access token.')
+            return false
         }
+    } catch (err) {
+        log.error('Exception during token refresh:', err)
+        return false
     }
-    
 }
 
 /**

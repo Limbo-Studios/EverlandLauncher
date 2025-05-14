@@ -25,6 +25,87 @@
         </div>
         <button id="accountSelectManage" class="overlayKeybindEnter" type="submit"><%- lang('overlay.accountSelectManage') %></button>
     </div>
+    <!-- Contenedor para selección de perfiles con fuente correcta -->
+    <div id="profileSelectContent" style="display: none;">
+        <span id="profileSelectHeader" class="avenir-medium"><%- lang('overlay.profileSelectHeader') %></span>
+        <div id="profileSelectList">
+            <div id="profileSelectListScrollable">
+                <!-- Profile listings populated here. -->
+            </div>
+        </div>
+        <div id="profileSelectActions">
+            <button id="profileSelectConfirm" class="avenir-medium"><%- lang('overlay.profileSelectConfirm') %></button>
+            <div style="height: 10px;"></div>
+            <button id="profileSelectCancel"><%- lang('overlay.profileSelectCancel') %></button>
+        </div>
+    </div>
+    
+    <!-- Contenedor para gestión de texturas, con clases adecuadas para responsividad -->
+    <div id="textureManagerContent" style="display: none;">
+        <span id="textureManagerHeader" class="avenir-medium"><%- lang('overlay.textureManagerHeader') %></span>
+        <span id="texturePlayerName" class="avenir-book"></span>
+        <div id="textureManagerContainer">
+            <div id="skinViewerContainer">
+                <div id="skinCanvas"></div>
+                <div class="skinViewControls">
+                    <!-- ...existing controls... -->
+                </div>
+            </div>
+            <div id="textureControlsContainer">
+                <div class="textureSection">
+                    <div class="textureSectionHeader avenir-medium"><%- lang('overlay.textureManager.skin') %></div>
+                    <div class="modelSelectionContainer">
+                        <span id="modelLabelSteve" class="modelLabel steve active">Steve</span>
+                        <label class="toggleSwitch modelSelectionSwitch">
+                            <input type="checkbox" id="skinModelSwitch">
+                            <span class="toggleSwitchSlider"></span>
+                        </label>
+                        <span id="modelLabelAlex" class="modelLabel alex">Alex</span>
+                    </div>
+                    <div class="textureButtons">
+                        <label for="skinFileInput" class="textureActionButton textureUploadButton avenir-book" style="display: inline-block; cursor: pointer; pointer-events: all;">
+                            <%- lang('overlay.textureManager.selectSkin') %>
+                            <input type="file" id="skinFileInput" accept=".png" style="display: none;">
+                        </label>
+                        <button id="deleteSkinButton" class="textureActionButton textureDeleteButton avenir-book"><%- lang('overlay.textureManager.deleteSkin') %></button>
+                    </div>
+                </div>
+                <div class="textureSection">
+                    <div class="textureSectionHeader avenir-medium"><%- lang('overlay.textureManager.cape') %></div>
+                    <div class="textureButtons">
+                        <label for="capeFileInput" class="textureActionButton textureUploadButton avenir-book" style="display: inline-block; cursor: pointer; pointer-events: all;">
+                            <%- lang('overlay.textureManager.selectCape') %>
+                            <input type="file" id="capeFileInput" accept=".png" style="display: none;">
+                        </label>
+                        <button id="deleteCapeButton" class="textureActionButton textureDeleteButton avenir-book"><%- lang('overlay.textureManager.deleteCape') %></button>
+                    </div>
+                </div>
+                <!-- Botón de confirmación para subir texturas -->
+                <div class="textureSection">
+                    <button id="confirmTextureUpload" class="textureActionButton confirmUploadButton avenir-book" disabled style="cursor: pointer; z-index: 10; position: relative;">
+                        <%- lang('overlay.textureManager.confirmUpload') || 'Confirmar y Subir' %>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="textureManagerStatus" class="avenir-book"></div>
+        <div id="textureManagerActions">
+            <button id="textureManagerClose" class="overlayKeybindEsc avenir-medium"><%- lang('overlay.textureManager.close') %></button>
+        </div>
+    </div>
+
+    <!-- Diálogo de confirmación para eliminar -->
+    <div id="confirmDeleteDialog" style="display: none;" class="confirmDialog">
+        <div class="confirmDialogContent">
+            <div class="confirmDialogHeader avenir-medium">¿Estás seguro?</div>
+            <div class="confirmDialogMessage avenir-book">Esta acción no se puede deshacer.</div>
+            <div class="confirmDialogButtons">
+                <button id="confirmDeleteButton" class="dialogButton confirmButton avenir-book">Eliminar</button>
+                <button id="cancelDeleteButton" class="dialogButton cancelButton avenir-book">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="overlayContent">
         <span id="overlayTitle">Lorem Ipsum:<br>Finis Illud</span>
         <span id="overlayDesc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud..</span>
@@ -36,4 +117,5 @@
         </div>
     </div>
     <script src="./assets/js/scripts/overlay.js"></script>
+    <script src="./assets/js/scripts/skinview3d.bundle.js"></script>
 </div>

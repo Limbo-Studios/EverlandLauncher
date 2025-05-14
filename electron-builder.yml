@@ -1,5 +1,5 @@
-appId: 'LimboLauncher'
-productName: 'Limbo Launcher'
+appId: 'EverlandLauncher'
+productName: 'Everland Launcher'
 artifactName: '${productName}-setup-${version}.${ext}'
 
 copyright: 'Copyright © 2024 Limbo-Studios'
@@ -42,7 +42,7 @@ linux:
   target: 'AppImage'
   maintainer: 'IkyMax'
   vendor: 'IkyMax'
-  synopsis: 'Launcher de Limbo-Studios para Lurkarya'
+  synopsis: 'Launcher de Limbo-Studios para Everland'
   description: 'Custom launcher maded for Limbo-Studios projects by IkyMax'
   category: 'Game'
 

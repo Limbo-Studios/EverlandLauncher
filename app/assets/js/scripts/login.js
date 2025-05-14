@@ -186,8 +186,115 @@ loginButton.addEventListener('click', () => {
 
     // Show loading stuff.
     loginLoading(true)
+    
+    // Generar un nuevo clientToken único para cada intento de login
+    ConfigManager.generateClientToken() // Garantiza token único por login
 
     AuthManager.addMojangAccount(loginUsername.value, loginPassword.value).then((value) => {
+        // Check if profile selection is required
+        if (value.requiresProfileSelection) {
+            loginLoading(false)
+            formDisabled(false)
+            
+            // Preparar el overlay de selección de perfil
+            prepareProfileSelectionList(value, 
+                // Accept callback
+                async (selectedProfile) => {
+                    try {
+                        // Mostrar carga
+                        formDisabled(true)
+                        loginLoading(true)
+                        
+                        // Refrescar token con el perfil seleccionado
+                        const refreshResponse = await AuthManager.selectMojangProfile(
+                            value.accessToken, 
+                            value.clientToken, 
+                            selectedProfile.id, 
+                            selectedProfile.name
+                        )
+                        
+                        const session = refreshResponse
+                        
+                        // Actualizar la cuenta con el perfil seleccionado
+                        const account = ConfigManager.addMojangAuthAccount(
+                            session.selectedProfile.id,
+                            session.selectedProfile.id,
+                            session.accessToken,
+                            session.clientToken,
+                            loginUsername.value,
+                            session.selectedProfile.name,
+                            value.originalProfiles || value.availableProfiles
+                        )
+                        
+                        // Guardar la configuración
+                        ConfigManager.save()
+                        
+                        // Cerrar overlay
+                        toggleOverlay(false)
+                        
+                        // Actualizar UI con la cuenta seleccionada
+                        updateSelectedAccount(account)
+                        
+                        // Mostrar éxito y cambiar vista
+                        loginButton.innerHTML = loginButton.innerHTML.replace(Lang.queryJS('login.loggingIn'), Lang.queryJS('login.success'))
+                        $('.circle-loader').toggleClass('load-complete')
+                        $('.checkmark').toggle()
+                        
+                        setTimeout(() => {
+                            switchView(VIEWS.login, loginViewOnSuccess, 500, 500, async () => {
+                                // Temporary workaround
+                                if(loginViewOnSuccess === VIEWS.settings){
+                                    await prepareSettings()
+                                }
+                                loginViewOnSuccess = VIEWS.landing // Reset this for good measure.
+                                loginCancelEnabled(false) // Reset this for good measure.
+                                loginViewCancelHandler = null // Reset this for good measure.
+                                loginUsername.value = ''
+                                loginPassword.value = ''
+                                $('.circle-loader').toggleClass('load-complete')
+                                $('.checkmark').toggle()
+                                loginLoading(false)
+                                loginButton.innerHTML = loginButton.innerHTML.replace(Lang.queryJS('login.success'), Lang.queryJS('login.login'))
+                                formDisabled(false)
+                            })
+                        }, 1000)
+                        
+                    } catch (error) {
+                        // Manejar error
+                        loginLoading(false)
+                        formDisabled(false)
+                        toggleOverlay(false)
+                        
+                        let actualDisplayableError
+                        if(isDisplayableError(error)) {
+                            msftLoginLogger.error('Error while refreshing login.', error)
+                            actualDisplayableError = error
+                        } else {
+                            // Uh oh.
+                            msftLoginLogger.error('Unhandled error during login.', error)
+                            actualDisplayableError = Lang.queryJS('login.error.unknown')
+                        }
+
+                        setOverlayContent(actualDisplayableError.title, actualDisplayableError.desc, Lang.queryJS('login.tryAgain'))
+                        setOverlayHandler(() => {
+                            toggleOverlay(false)
+                        })
+                        toggleOverlay(true)
+                    }
+                },
+                // Cancel callback
+                () => {
+                    toggleOverlay(false)
+                    loginLoading(false)
+                    formDisabled(false)
+                }
+            )
+            
+            toggleOverlay(true, false, 'profileSelectContent')
+            return
+        }
+        
+        // Normal account login (no profile selection needed)
         updateSelectedAccount(value)
         loginButton.innerHTML = loginButton.innerHTML.replace(Lang.queryJS('login.loggingIn'), Lang.queryJS('login.success'))
         $('.circle-loader').toggleClass('load-complete')
@@ -230,5 +337,4 @@ loginButton.addEventListener('click', () => {
         })
         toggleOverlay(true)
     })
-
 })

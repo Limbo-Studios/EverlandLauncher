@@ -10,6 +10,10 @@ const extraFileVerif                               = require('./assets/extraveri
 const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants');
 const { log } = require('console');
 const logger = LoggerUtil.getLogger('Settings')
+const {
+    validateSelectedJvm,
+    ensureJavaDirIsRoot,
+}                             = require('limbo-core/java')
 
 const settingsState = {
     invalid: new Set()
@@ -417,6 +421,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
                 updateSelectedAccount(value)
                 switchView(getCurrentView(), viewOnClose, 500, 500, async () => {
                     await prepareSettings()
+                    forceAccountRefresh()
                 })
             })
                 .catch((displayableError) => {
@@ -442,6 +447,69 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
         }
     }
 })
+
+/**
+ * Update UI username displays based on the current ConfigManager data.
+ * This ensures the UI reflects the latest username from the database.
+ */
+function refreshUsernames() {
+    const authAccounts = ConfigManager.getAuthAccounts()
+    const authAccountElements = document.getElementsByClassName('settingsAuthAccount')
+    
+    Array.from(authAccountElements).forEach(accElem => {
+        const uuid = accElem.getAttribute('uuid')
+        const clientToken = accElem.getAttribute('clientToken')
+        
+        // Find the corresponding account in the config
+        for (const key in authAccounts) {
+            const acc = authAccounts[key]
+            if (acc.uuid === uuid) {
+                // Update username display
+                const usernameElement = accElem.querySelector('.settingsAuthAccountDetailValue')
+                if (usernameElement && usernameElement.textContent !== acc.displayName) {
+                    usernameElement.textContent = acc.displayName
+                    logger.info('Updated username display for', uuid, 'to', acc.displayName)
+                }
+                break
+            }
+        }
+    })
+}
+
+/**
+ * Force refresh of account information from ConfigManager and update UI.
+ * This should be called after any database updates related to accounts.
+ */
+function forceAccountRefresh() {
+    // Modificamos esta función para evitar regenerar todo el HTML
+    const authAccounts = ConfigManager.getAuthAccounts()
+    const currentAccountElements = document.getElementsByClassName('settingsAuthAccount')
+    
+    // Solo regeneramos el HTML si hay una diferencia en el número de cuentas
+    // o si hay cuentas nuevas/eliminadas
+    const accountElementIds = Array.from(currentAccountElements).map(el => el.getAttribute('clientToken'))
+    const configAccountIds = Object.keys(authAccounts).map(key => authAccounts[key].clientToken)
+    
+    // Verificamos si las cuentas en UI coinciden con las de la configuración
+    const needsFullRefresh = 
+        accountElementIds.length !== configAccountIds.length || 
+        !accountElementIds.every(id => configAccountIds.includes(id)) ||
+        !configAccountIds.every(id => accountElementIds.includes(id))
+    
+    if (needsFullRefresh) {
+        // Solo regeneramos todo si es necesario
+        setTimeout(() => {
+            populateAuthAccounts()
+            bindAuthAccountSelect()
+            bindAuthAccountLogOut()
+            bindAuthAccountTextureManager()
+        }, 50)
+    } else {
+        // Si no se necesita regeneración completa, solo actualizamos elementos específicos
+        refreshAuthAccountSelected(ConfigManager.getSelectedAccount().clientToken)
+        refreshUsernames()
+    }
+}
 
 /**
  * Bind functionality for the account selection buttons. If another account
@@ -642,9 +710,10 @@ function populateAuthAccounts(){
         const acc = authAccounts[val]
         logger.info('Actual Client:', acc.clientToken)
 
-        const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}" clientToken="${acc.clientToken}">
+        const mojang = `<div class="settingsAuthAccount" uuid="${acc.uuid}" accessToken="${acc.accessToken}" 
+                            clientToken="${acc.clientToken}" displayName="${acc.displayName}" type="mojang" ${selectedUUID === acc.uuid ? 'selected' : ''}>
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/bodybust/${acc.uuid}?length=60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.everland.lsmp.tech/bodybust/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -661,14 +730,16 @@ function populateAuthAccounts(){
                     <button class="settingsAuthAccountSelect" ${selectedClient === acc.clientToken ? 'selected>' + Lang.queryJS('settings.authAccountPopulate.selectedAccount') : '>' + Lang.queryJS('settings.authAccountPopulate.selectAccount')}</button>
                     <div class="settingsAuthAccountWrapper">
                         <button class="settingsAuthAccountLogOut">${Lang.queryJS('settings.authAccountPopulate.logout')}</button>
+                        <button class="settingsAuthAccountTextureManager">${Lang.queryJS('settings.authAccountPopulate.manageTextures')}</button>
                     </div>
                 </div>
             </div>
         </div>`
 
-        const microsoft = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
+        const microsoft = `<div class="settingsAuthAccount" uuid="${acc.uuid}" accessToken="${acc.accessToken}" 
+                              clientToken="${acc.clientToken}" displayName="${acc.displayName}" type="microsoft" ${selectedUUID === acc.uuid ? 'selected' : ''}>
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.lsmp.site/bodybust/${acc.uuid}?length=60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://nmsr.everland.lsmp.tech/bodybust/${acc.uuid}?length=60">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -685,6 +756,7 @@ function populateAuthAccounts(){
                     <button class="settingsAuthAccountSelect" ${selectedUUID === acc.uuid ? 'selected>' + Lang.queryJS('settings.authAccountPopulate.selectedAccount') : '>' + Lang.queryJS('settings.authAccountPopulate.selectAccount')}</button>
                     <div class="settingsAuthAccountWrapper">
                         <button class="settingsAuthAccountLogOut">${Lang.queryJS('settings.authAccountPopulate.logout')}</button>
+                        <button class="settingsAuthAccountTextureManager">${Lang.queryJS('settings.authAccountPopulate.manageTextures')}</button>
                     </div>
                 </div>
             </div>
@@ -702,12 +774,50 @@ function populateAuthAccounts(){
 }
 
 /**
+ * Bind button to manage textures for the selected account.
+ */
+function bindAuthAccountTextureManager() {
+    Array.from(document.getElementsByClassName('settingsAuthAccountTextureManager')).forEach(element => {
+        element.addEventListener('click', () => {
+            const accountContainer = element.closest('.settingsAuthAccount')
+            if (accountContainer) {
+                const uuid = accountContainer.getAttribute('uuid')
+                const accessToken = accountContainer.getAttribute('accessToken')
+                const displayName = accountContainer.getAttribute('displayName')
+                const clientToken = accountContainer.getAttribute('clientToken')
+                const type = accountContainer.hasAttribute('type') ? accountContainer.getAttribute('type') : 'mojang'
+                
+                if (uuid && accessToken) {
+                    const account = {
+                        uuid,
+                        accessToken,
+                        displayName,
+                        clientToken,
+                        type
+                    }
+                    
+                    console.log('Cuenta seleccionada para administrar texturas:', account)
+                    
+                    toggleTextureManager(account)
+                } else {
+                    console.error('No se pudo obtener UUID o accessToken de la cuenta seleccionada')
+                }
+            } else {
+                console.error('No se pudo encontrar el contenedor de la cuenta')
+            }
+        })
+    })
+}
+
+/**
  * Prepare the accounts tab for display.
  */
 function prepareAccountsTab() {
     populateAuthAccounts()
     bindAuthAccountSelect()
     bindAuthAccountLogOut()
+    bindAuthAccountTextureManager()
+    refreshUsernames()
 }
 
 /**
@@ -1046,11 +1156,11 @@ async function reloadDropinMods(){
 }
 
 //Languages
+    //"en_US": "English",
+    //"fr_FR": "Français",
+    //"pt_BR": "Português"
 let langCodes = {
-    "en_US": "English",
-    "es_MX": "Español",
-    "fr_FR": "Français",
-    "pt_BR": "Português"
+    "es_MX": "Español"
 } 
 
 async function resolveLanguageForUI() {
@@ -1564,7 +1674,7 @@ function populateAboutVersionInformation(){
  */
 function populateReleaseNotes(){
     $.ajax({
-        url: 'https://github.com/Limbo-Studios/Limbolauncher/releases.atom',
+        url: 'https://github.com/Limbo-Studios/EverlandLauncher/releases.atom',
         success: (data) => {
             const version = 'v' + remote.app.getVersion()
             const entries = $(data).find('entry')
@@ -1689,6 +1799,21 @@ async function prepareSettings(first = false) {
     await prepareJavaTab()
     prepareAboutTab()
 }
+
+// Add a polling mechanism to check for changes periodically
+let lastAccountsState = JSON.stringify(ConfigManager.getAuthAccounts())
+function pollAccountChanges() {
+    const currentState = JSON.stringify(ConfigManager.getAuthAccounts())
+    if (currentState !== lastAccountsState) {
+        lastAccountsState = currentState
+        forceAccountRefresh()
+    }
+    setTimeout(pollAccountChanges, 3000) // Check every 3 seconds
+}
+// Start polling when settings are loaded
+document.addEventListener('DOMContentLoaded', () => {
+    pollAccountChanges()
+})
 
 // Prepare the settings UI on startup.
 //prepareSettings(true)

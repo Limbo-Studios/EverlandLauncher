@@ -1,0 +1,381 @@
+[ejs.landing]
+updateAvailableTooltip = "Mise à jour disponible"
+usernamePlaceholder = "Nom d'utilisateur"
+usernameEditButton = "Changer"
+settingsTooltip = "Paramètres"
+serverStatus = "SERVEUR"
+serverStatusPlaceholder = "HORS LIGNES"
+mojangStatus = "ÉTAT DE LIMBOAUTH"
+mojangStatusTooltipTitle = "Services"
+mojangStatusNETitle = "Non&nbsp;Essentiel"
+newsButton = "ACTUALITÉS"
+launchButton = "JOUER"
+launchButtonPlaceholder = "&#8226; Aucun serveur sélectionné"
+launchDetails = "Veuillez patienter.."
+newsNavigationStatus = "{currentPage} sur {totalPages}"
+newsErrorLoadSpan = "Recherche de l'actualité.."
+newsErrorFailedSpan = "Échec du chargement de l'actualité"
+newsErrorRetryButton = "Réessayer"
+newsErrorNoneSpan = "Pas d'articles"
+
+[ejs.login]
+loginAnnulerText = "Annuler"
+loginSubheader = "CONNEXION MINECRAFT"
+loginEmailError = "* Valeure invalide"
+loginEmailPlaceholder = "EMAIL OU NOM D'UTILISATEUR"
+loginPasswordError = "* Requis"
+loginPasswordPlaceholder = "MOT DE PASSE"
+loginForgotPasswordLink = "https://discord.com/channels/1088661129615642716/1231456034199961620"
+loginForgotPasswordText = "mot de passe oublié?"
+loginRememberMeText = "se souvenir de moi?"
+loginButtonText = "CONNEXION"
+loginNeedAccountLink = "https://discord.com/channels/1088661129615642716/1231456034199961620"
+loginNeedAccountText = "Besoin d'un compte?"
+loginPasswordDisclaimer1 = "Votre mot de passe est envoyé directement à Limbo et n'est jamais stocké."
+loginPasswordDisclaimer2 = "{appName} n'est pas affilié à Mojang AB."
+
+[ejs.loginOptions]
+loginOptionsTitle = "Options de Connexion"
+loginWithMicrosoft = "Connexion Microsoft"
+loginWithMojang = "Connexion avec LimboAuth"
+AnnulerButton = "Annuler"
+
+[ejs.overlay]
+serverSelectHeader = "Serveurs disponibles"
+accountSelectHeader = "Sélectionner un compte"
+accountSelectConfirm = "Sélectionner"
+accountSelectAnnuler = "Annuler"
+accountSelectManage = "Gérer les comptes"
+
+[ejs.settings]
+navHeaderText = "Paramètres"
+navAccount = "Compte"
+navMinecraft = "Minecraft"
+navMods = "Mods"
+navJava = "Java"
+navLauncher = "Launcher"
+navAbout = "À propos"
+navUpdates = "Mises à jour"
+navDone = "Terminé"
+syncGameLang = "Si la langue du jeu doit être la même que celle du launcher"
+tabAccountHeaderText = "Paramètres du compte"
+tabAccountHeaderDesc = "Ajouter de nouveaux comptes ou gérer les comptes existants."
+microsoftAccount = "Microsoft"
+addMicrosoftAccount = "+ Ajouter un compte Microsoft"
+mojangAccount = "LimboAuth"
+addMojangAccount = "+ Ajouter un compte LimboAuth"
+minecraftTabHeaderText = "Paramètres Minecraft"
+minecraftTabHeaderDesc = "Options relatives au lancement du jeu."
+gameResolutionTitle = "Résolution du jeu"
+launchFullscreenTitle = "Lancer en plein écran."
+autoConnectTitle = "Connexion automatique au serveur lors du lancement."
+launchDetachedTitle = "Lancer le processus de jeu détaché du lanceur."
+launchDetachedDesc = "Si le jeu n'est pas détaché, la fermeture du lanceur entraînera également la fermeture du jeu.."
+tabModsHeaderText = "Paramètres des Mods"
+tabModsHeaderDesc = "Activer ou désactiver les mods."
+switchServerButton = "Changer"
+requiredMods = "Mods requis"
+optionalMods = "Mods optionels"
+dropinMods = "Mods 'Drop-in'"
+addMods = "Ajouter un Mod"
+dropinRefreshNote = "(F5 pour rafraichir)"
+shaderpacks = "Shaderpacks"
+shaderpackDesc = "Activer ou désactiver les shaders. Veuillez noter que les shaders ne fonctionneront correctement que sur des ordinateurs puissants. Vous pouvez ajouter des shaders ici."
+selectShaderpack = "Sélectrioner le shader"
+tabJavaHeaderText = "Paramètres Java"
+tabJavaHeaderDesc = "Gérer la configuration Java (avancé)."
+memoryTitle = "Mémoire"
+maxRAM = "RAM Maximum"
+minRAM = "RAM Minimum"
+memoryDesc = "La RAM minimale recommandée est de 3Go. Mettre les valeurs minimale et maximale à la même valeur peut réduire le lag."
+memoryTotalTitle = "Total"
+memoryAvailableTitle = "Disponible"
+javaExecutableTitle = "Éxécutable Java"
+javaExecSelDialogTitle = "Choisir l'éxécutable Java"
+javaExecSelButtonText = "Choisir le fichier"
+javaExecDesc = "L'exécutable Java est validé avant le lancement du jeu."
+javaPathDesc = "Le chemin doit se terminer par <strong>{pathSuffix}</strong>."
+jvmOptsTitle = "Options supplémentaires JVM"
+jvmOptsDesc = "Arguments JVM au moment de l'exécution du jeu. Ne pas inculre <em>-Xms</em> and <em>-Xmx</em>"
+launcherTabHeaderText = "Paramètres du Launcher"
+launcherTabHeaderDesc = "Options relatives au lanceur lui-même."
+allowPrereleaseTitle = "Autoriser les version 'Pre-release'."
+allowPrereleaseDesc = "Pre-Releases incluent de nouvelles fonctionnalités qui peuvent ne pas avoir été entièrement testées ou intégrées.<br>Ce sera toujours le cas si vous utilisez cette version."
+dataDirectoryTitle = "Répertoire de données"
+selectDataDirectory = "Sélectionner le dossier des données"
+chooseFolder = "Choisir le dossier"
+dataDirectoryDesc = "Tous les fichiers de jeu et les installations Java locales seront stockés dans ce dossier.<br>Les captures d'écran et les sauvegardes du monde sont stockées dans le dossier instance de la configuration serveur correspondante."
+aboutTabHeaderText = "À propos"
+aboutTabHeaderDesc = "View information and release notes for the current version."
+aboutTitle = "{appName}"
+stableRelease = "Version stable"
+versionText = "Version "
+sourceGithub = "Source (GitHub)"
+support = "Support"
+devToolsConsole = "Console DevTools"
+releaseNotes = "Notes de version"
+changelog = "Changelog"
+noReleaseNotes = "Pas de notes de version"
+viewReleaseNotes = "Voire les notes sur Github."
+launcherUpdatesHeaderText = "Mises à jour du launcher"
+launcherUpdatesHeaderDesc = "Télécharger"
+checkForUpdates = "Vérifier les mises à jour"
+whatsNew = "Quoi de neuf"
+updateReleaseNotes = "Notes de la mise à jour"
+
+[ejs.waiting]
+waitingText = "En attente deMicrosoft.."
+
+[ejs.welcome]
+continueButton = "CONTINUER"
+
+
+[js.discord]
+waiting = "En attente du client.."
+state = "Serveur: {shortId}"
+srvt = "Je joue sur Lurkarya!"
+
+[js.index]
+microsoftLoginTitle = "Connexion Microsoft"
+microsoftLogoutTitle = "Déconnexion Microsoft"
+
+[js.login]
+login = "CONNEXION"
+loggingIn = "CONNEXION.."
+success = "SUCCÈS"
+tryAgain = "Réessayer"
+
+[js.login.error]
+invalidValue = "* Valeur Invalide"
+requiredValue = "* Requis"
+
+[js.login.error.unknown]
+title = "Erreur inconnue lors de la connexion"
+desc = "Une erreur inconnue s'est produite. Veuillez consulter la console pour plus de détails."
+
+[js.landing.launch]
+pleaseWait = "Veuillez patienter.."
+failureTitle = "Erreur lors du lancement"
+failureText = "Voir la console (CTRL + Shift + i) pour plus de détails.."
+okay = "Ok"
+
+[js.landing.selectedAccount]
+noAccountSelected = "Aucun compte sélectionné"
+
+[js.landing.selectedServer]
+noSelection = "Aucun serveur sélectionné"
+loading = "Chargement.."
+
+[js.landing.serverStatus]
+server = "SERVEUR"
+offline = "HORS LIGNE"
+players = "JOUEURS"
+
+[js.landing.systemScan]
+checking = "Vérification des informations système.."
+noCompatibleJava = "Aucune installation compatible<br>Java n'a été trouvée"
+installJavaMessage = "Pour lancer Minecraft, vous devez disposer d'une installation 64 bits de Java {major}. Voulez-vous que nous en installions une copie ?"
+installJava = "Installer Java"
+installJavaManually = "Installer Manuellement"
+javaDownloadPrepare = "Préparation du téléchargement de Java.."
+javaDownloadFailureTitle = "Erreur lors du téléchargement de Java"
+javaDownloadFailureText = "Voir la console (CTRL + Shift + i) pour plus de détails."
+javaRequired = "Java est requis<br>pour lancer"
+javaRequiredMessage = 'Une installation x64 valide de Java {major} est requise pour le lancement.<br><br>Veuillez vous référer à notre <a href="https://github.com/Limbo-Studios/EverlandLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Guide de gestion Java</a> pour savoir comment installer manuellement Java.'
+javaRequiredDismiss = "J'ai compris"
+javaRequiredAnnuler = "Retour"
+
+[js.landing.downloadJava]
+findJdkFailure = "Échec lors de la recherche de la distribution OpenJDK."
+javaDownloadCorruptedError = "Le JDK téléchargé a un mauvais hachage, le fichier peut être corrompu."
+extractingJava = "Extraction de Java"
+javaInstalled = "Java Installed!"
+
+[js.landing.dlAsync]
+loadingServerInfo = "Loading server information.."
+fatalError = "Erreur Fatale"
+unableToLoadDistributionIndex = "Impossible de charger une copie de l'index de distribution. Voir la console (CTRL + Shift + i) pour plus de détails."
+pleaseWait = "Patientez.."
+errorDuringLaunchTitle = "Erreur lors du lancement."
+seeConsoleForDetails = "Voir la console (CTRL + Shift + i) pour plus de détails."
+validatingFileIntegrity = "Validation de l'intégritée des fichiers."
+errorDuringFileVerificationTitle = "Erreur lors de la validation des fichiers"
+downloadingFiles = "Téléchargement des fichiers.."
+errorDuringFileDownloadTitle = "Erreur lors du téléchargement des fichiers"
+preparingToLaunch = "Préparation du lancement.."
+launchingGame = "Lancement du jeu.."
+launchWrapperNotDownloaded = "Le fichier principal, LaunchWrapper, n'a pas été téléchargé correctement. Par conséquent, le jeu ne peut pas se lancer.<br><br>Pour résoudre ce problème, désactivez temporairement votre logiciel antivirus et relancez le jeu.<br><br>Si vous avez le temps, veuillez <a href=\"https://github.com/dscalzi/HeliosLauncher/issues\">soumettre un problème</a> et nous indiquer le logiciel antivirus que vous utilisez. Nous les contacterons et essaierons d'arranger les choses."
+doneEnjoyServer = "Fini, profitez du serveur !"
+checkConsoleForDetails = "Veuillez consulter la console (CTRL + Shift + i) pour plus de détails."
+accountLoginNeeded = "You must be logged into an account."
+fullRepairMode = "Full Repair Module exited with code {code}, assuming error."
+errFileVerification = "Error during file validation."
+accountToProcessBuilder = "Sending selected account ({userDisplayName}) to ProcessBuilder."
+gameError = "Game error: {data}"
+gameExited = "Game process exited with code {code}."
+gameErrorDuringLaunch = "Error during game launch {error}."
+waintingLaunchingGame = "Waiting for game window..."
+
+[js.landing.dlAsync.extraFileVerif]
+distributionIdentityError = "Expected Identity from Distribution for {moduleName}: {moduleIdentity}."
+modIdentityExtraction = "Extracting identity for mod at: {filePath}."
+identityNotFoundUsingHash  = "No identity found in manifest for {filePath}, using hash: {hash}"
+startingModValidation = "Starting mod validation..."
+modValidationBypassed = "Skipping validation for excluded mod: {mod}"
+validatingMod = "Validating mod: {mod}"
+expectedAndCalculatedIdentity = "Expected Identity: {expectedIdentity}, Calculated Identity for {mod}: {modIdentity}"
+modIdentityMismatchError = "Mod identity mismatch! Mod: {mod}, Expected: {expectedIdentity}, Found: {modIdentity}"
+expectedIdentityNotFound = "No expected identity found for mod: {mod}. Marking as invalid."
+modValidationCompleted = "Mod validation completed."
+invalidModsDetectedMessage = "Extra file verification has detected invalid mods. Please delete the {folder} folder and restart the launcher."
+downloadingFiles = "No invalid files, skipping download."
+usingExtraFileVerif = "Extra file verification activated, Resource usage..."
+notUsingExtraFileVerif = "Extra file verification deactivated, Not using resources..."
+
+[js.landing.news]
+checking = "Vérification de l'actualité"
+
+[js.landing.discord]
+loading = "Chargement du jeu.."
+joining = "Dans le menu Lukarya!"
+joined = "Explorer les mystères de ces Terres...!"
+
+[js.overlay]
+dismiss = "J'ai compris"
+
+[js.processbuilder.exit]
+exitErrorHeader = "Le jeu a quitté avec un code d'erreur"
+message = "Le jeu s'est fermé avec le code d'erreur : "
+copyCode = "Copier le code d'erreur"
+copyCodeText = "Code d'erreur de Minecraft "
+
+[js.settings.fileSelectors]
+executables = "Éxécutables"
+allFiles = "Tout les fichiers"
+
+[js.settings.mstfLogin]
+errorTitle = "Quelque chose a mal tourné"
+errorMessage = "L'authentification Microsoft a échoué. Veuillez réessayer."
+okButton = "OK"
+
+[js.settings.mstfLogout]
+errorTitle = "Something Went Wrong"
+errorMessage = "Microsoft logout failed. Please try again."
+okButton = "OK"
+
+[js.settings.authAccountSelect]
+selectButton = "Quelque chose a mal tourné"
+selectedButton = "Compte sélectionné &#10004;"
+
+[js.settings.authAccountLogout]
+lastAccountWarningTitle = "Attention<br>Ceci est votre dernier compte"
+lastAccountWarningMessage = "Pour utiliser le launcher, vous devez être conneté à au moins un compte. Vous devrez vous reconnecter après.<br><br>Voulez vous vraiment vous déconecter ?"
+confirmButton = "Oui"
+AnnulerButton = "Annuler"
+
+[js.settings.authAccountPopulate]
+username = "Nom d'utilisateur"
+uuid = "UUID"
+selectAccount = "Sélectionner un compte"
+selectedAccount = "Compte sélectionné ✓"
+logout = "Déconnexion"
+
+[js.settings.dropinMods]
+removeButton = "Supprimer"
+deleteFailedTitle = "Échec de la suppression<br>Du mod {fullName}"
+deleteFailedMessage = "Assurez-vous que le fichier n'est pas utilisé et réessayez."
+failedToggleTitle = "Échec lors du changement d'utilisation <br>d'un ou plusieurs mods Drop-in"
+okButton = "J'ai compris"
+
+[js.settings.serverListing]
+mainServer = "Serveur principal"
+
+[js.settings.java]
+selectedJava = "Sélectioné: Java {version} ({vendor})"
+invalidSelection = "Sélection non valide"
+requiresJava = "Java {major} x64 est requis."
+availableOptions = "Options disponibles pour Java {major} (HotSpot VM)"
+
+[js.settings.about]
+preReleaseTitle = "Pre-release"
+stableReleaseTitle = "Version stable"
+releaseNotesFailed = "Échec du chargement des notes de mise à jour."
+
+[js.settings.updates]
+newReleaseTitle = "Nouvelle version disponible"
+newPreReleaseTitle = "Nouvelle Pre-release disponible"
+downloadingButton = "Téléchargement.."
+downloadButton = 'Télécharger depuis GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Fermez le lanceur et lancez le dmg pour mettre à jour.</span>'
+latestVersionTitle = "Vous utilisez la dernière version."
+checkForUpdatesButton = "Vérifier les mises à jour"
+checkingForUpdatesButton = "Vérification des mises à jour.."
+
+[js.settings.msftLogin]
+errorTitle = "Échec de la connexion Microsoft"
+errorMessage = "Nous n'avons pas pu authentifier votre compte Microsoft. Veuillez réessayer."
+okButton = "OK"
+
+[js.uibinder.startup]
+fatalErrorTitle = "Erreur fatale : Impossible de charger l'index de distribution"
+fatalErrorMessage = "Une connexion aux serveurs n'a pas pu être établie pour télécharger l'index de distribution. Aucune copie locale n'était disponible pour le chargement. L'index de distribution est un fichier essentiel qui fournit les dernières informations sur le serveur. Le lanceur ne peut pas démarrer sans cet index. <br><br> Assurez-vous que vous êtes connecté à Internet et relancez l'application."
+closeButton = "Fermer"
+
+[js.uibinder.validateAccount]
+failedMessageTitle = "Échec de l'actualisation de la connexion"
+failedMessage = "Nous n'avons pas pu actualiser la connexion pour <strong>{compte}</strong>. Veuillez sélectionner un autre compte ou vous connecter à nouveau."
+failedMessageSelectAnotherAccount = "Nous n'avons pas pu actualiser la connexion pour <strong>{compte}</strong>. Veuillez vous connecter à nouveau."
+loginButton = "Connexion"
+selectAnotherAccountButton = "Sélectionner un autre compte"
+
+[js.uicore.autoUpdate]
+checkingForUpdateButton = "Vérification des mises à jour..."
+installNowButton = "Installer Maintenant"
+checkForUpdatesButton = "Vérifier les mises à jour"
+
+[js.auth.microsoft.error]
+noProfileTitle = "Erreur lors de la connexion:<br>Le profil n'est pas configuré"
+noProfileDesc = "Votre compte Microsoft n'a pas encore de profil Minecraft configuré. Si vous avez récemment acheté le jeu ou l'avez obtenu via Xbox Game Pass, vous devez configurer votre profil sur <a href=\"https://minecraft.net/\">Minecraft.net</a>.<br><br>Si vous n'avez pas encore acheté le jeu, vous pouvez également le faire sur <a href=\"https://minecraft.net/\">Minecraft.net</a>."
+noXboxAccountTitle = "Erreur lors de la connexion :<br>Aucun compte Xbox"
+noXboxAccountDesc = "Votre compte Microsoft n'a aucun compte Xbox associé."
+xblBannedTitle = "Erreur lors de la connexion :<br>Xbox Live indisponible"
+xblBannedDesc = "Votre compte Microsoft est d'un pays où Xbox Live n'est pas disponible ou est interdit."
+under18Title = "Erreur lors de la connexion :<br>Approbation parentale requise"
+under18Desc = "Les comptes pour les utilisateurs de moins de 18 ans doivent être ajoutés à une famille par un adulte."
+unknownTitle = "Erreur inconnue lors de la connexion"
+unknownDesc = "Une erreur inconnue s'est produite. Veuillez consulter la console pour plus de détails."
+
+[js.auth.mojang.error]
+methodNotAllowedTitle = "Erreur interne :<br>Méthode non autorisée"
+methodNotAllowedDesc = "Méthode non autorisée. Veuillez signaler cette erreur."
+notFoundTitle = "Erreur interne :<br>Non trouvé"
+notFoundDesc = "Le point de terminaison d'authentification n'a pas été trouvé. Veuillez signaler ce problème."
+accountMigratedTitle = "Erreur lors de la connexion :<br>Compte migré"
+accountMigratedDesc = "Vous avez tenté de vous connecter avec un compte migré. Réessayez en utilisant l'email du compte comme nom d'utilisateur."
+invalidCredentialsTitle = "Erreur lors de la connexion :<br>Identifiants invalides"
+invalidCredentialsDesc = "L'email ou le mot de passe que vous avez saisi est incorrect. Veuillez réessayer."
+playerNotFoundTitle = "Error During Login:<br>User not found."
+playerNotFoundDesc = "The user you've entered is invalid. Please try again."
+tooManyAttemptsTitle = "Erreur lors de la connexion :<br>Trop de tentatives"
+tooManyAttemptsDesc = "Il y a eu trop de tentatives de connexion avec ce compte récemment. Veuillez réessayer plus tard."
+invalidTokenTitle = "Erreur lors de la connexion :<br>Jeton invalide"
+invalidTokenDesc = "Le jeton d'accès fourni est invalide."
+tokenHasProfileTitle = "Erreur lors de la connexion :<br>Le jeton a un profil"
+tokenHasProfileDesc = "Le jeton d'accès a déjà un profil attribué. La sélection de profils n'est pas encore implémentée."
+credentialsMissingTitle = "Erreur lors de la connexion :<br>Identifiants manquants"
+credentialsMissingDesc = "Le nom d'utilisateur ou le mot de passe n'a pas été soumis ou le mot de passe fait moins de 3 caractères."
+invalidSaltVersionTitle = "Erreur lors de la connexion :<br>Version de sel invalide"
+invalidSaltVersionDesc = "Version de sel invalide."
+unsupportedMediaTypeTitle = "Erreur interne :<br>Type de média non supporté"
+unsupportedMediaTypeDesc = "Type de média non supporté. Veuillez signaler cette erreur."
+accountGoneTitle = "Erreur lors de la connexion :<br>Compte migré"
+accountGoneDesc = "Le compte a été migré vers un compte Microsoft. Veuillez vous connecter avec Microsoft."
+unreachableTitle = "Erreur lors de la connexion :<br>Inaccessible"
+unreachableDesc = "Impossible d'atteindre les serveurs d'authentification. Assurez-vous qu'ils sont en ligne et que vous êtes connecté à Internet."
+gameNotPurchasedTitle = "Erreur lors de la connexion :<br>Jeu non acheté"
+gameNotPurchasedDesc = "Le compte avec lequel vous essayez de vous connecter n'a pas acheté de copie de Minecraft. Vous pouvez acheter une copie sur <a href=\"https://minecraft.net/\">Minecraft.net</a>."
+unknownErrorTitle = "Erreur inconnue lors de la connexion"
+unknownErrorDesc = "Une erreur inconnue s'est produite. Veuillez consulter la console pour plus de détails."
+
+[js.news.NewsLink]
+URL = "https://news.lsmp.site/en_US/category/Noticias/feed/"
+#URL = "https://news.lsmp.site/fr_FR/category/Noticias/feed/" i will set this once i had set up the french lang on the news site

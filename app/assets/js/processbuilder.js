@@ -387,26 +387,26 @@ class ProcessBuilder {
         if(process.platform === 'darwin'){
             if(isDev){
                 if (current.type === 'microsoft') {
-                    args.push('-Xdock:name=LimboLauncher')
+                    args.push('-Xdock:name=EverlandLauncher')
                     args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-                    args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+                    args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
 
                 } else {
-                args.push('-Xdock:name=LimboLauncher')
+                args.push('-Xdock:name=EverlandLauncher')
                 args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
                 }
             } else {
             if (current.type === 'microsoft') {
                 args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
                 args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
                 args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-                args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+                args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
             } else {
                 args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
                 args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
                 args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-                args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+                args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
             }
         }
     }
@@ -415,25 +415,25 @@ class ProcessBuilder {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
             } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
             }
         } else {
         if (current.type === 'microsoft') {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
 
         } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         }
     }
         // Main Java Class
@@ -523,25 +523,25 @@ class ProcessBuilder {
             if(isDev){
                 
             if (current.type === 'microsoft') {
-                args.push('-Xdock:name=LimboLauncher')
+                args.push('-Xdock:name=EverlandLauncher')
                 args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+                args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
 
             } else {
-            args.push('-Xdock:name=LimboLauncher')
+            args.push('-Xdock:name=EverlandLauncher')
             args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         }
     } else {
         if (current.type === 'microsoft') {
-            args.push('-Xdock:name=LimboLauncher')
+            args.push('-Xdock:name=EverlandLauncher')
             args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-            args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
 
         } else {
-        args.push('-Xdock:name=LimboLauncher')
+        args.push('-Xdock:name=EverlandLauncher')
         args.push('-Xdock:icon=' + path.join(__dirname, '..', 'images', 'minecraft.icns'))
-        args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+        args.push(`-javaagent:${path.join(process.cwd(),'Contents', 'Resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         }
     }
 }
@@ -553,24 +553,24 @@ class ProcessBuilder {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
             } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(), 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         }
         } else {
         if (current.type === 'microsoft') {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         } else {
             args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
             args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
             args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
-            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://auth.lsmp.site/authlib-injector`)
+            args.push(`-javaagent:${path.join(process.cwd(),'resources', 'libraries', 'java', 'LimboAuth.jar')}=https://minecraft.everland.lsmp.tech/authlib-injector`)
         }
     }
         //estoy hasta los uebos, saquenme de aqui :3
@@ -669,7 +669,7 @@ class ProcessBuilder {
                             val = args[i].replace(argDiscovery, tempNativePath)
                             break
                         case 'launcher_name':
-                            val = args[i].replace(argDiscovery, 'LimboLauncher')
+                            val = args[i].replace(argDiscovery, 'EverlandLauncher')
                             break
                         case 'launcher_version':
                             val = args[i].replace(argDiscovery, this.launcherVersion)
