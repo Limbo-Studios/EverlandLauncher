@@ -89,13 +89,19 @@ function toggleOverlay(toggleState, dismissable = false, content = 'overlayConte
 
         // Make things untabbable.
         $('#main *').attr('tabindex', '-1')
-        $('#' + content).parent().children().hide()
+        
+        // Primero ocultar TODOS los contenidos posibles
+        $('#overlayContainer > div').hide()
+        
+        // Luego mostrar SOLO el contenido específico solicitado
         $('#' + content).show()
+        
         if(dismissable){
             $('#overlayDismiss').show()
         } else {
             $('#overlayDismiss').hide()
         }
+        
         $('#overlayContainer').fadeIn({
             duration: 250,
             start: () => {
@@ -107,9 +113,11 @@ function toggleOverlay(toggleState, dismissable = false, content = 'overlayConte
     } else {
         document.getElementById('main').removeAttribute('overlay')
         overlayContainer.removeAttribute('content')
+        overlayContainer.removeAttribute('popup')
 
         // Make things tabbable.
         $('#main *').removeAttr('tabindex')
+        
         $('#overlayContainer').fadeOut({
             duration: 250,
             start: () => {
@@ -118,13 +126,10 @@ function toggleOverlay(toggleState, dismissable = false, content = 'overlayConte
                 }
             },
             complete: () => {
-                $('#' + content).parent().children().hide()
-                $('#' + content).show()
-                if(dismissable){
-                    $('#overlayDismiss').show()
-                } else {
-                    $('#overlayDismiss').hide()
-                }
+                // Ocultar todos los contenidos al cerrar el overlay
+                $('#overlayContainer > div').hide()
+                // Mostrar el contenido por defecto para la próxima vez
+                $('#overlayContent').show()
             }
         })
     }
@@ -136,6 +141,31 @@ async function toggleServerSelection(toggleState){
 }
 
 async function toggleAccountSelection(toggleState, popup = false){    
+    // Verificar si hay cuentas disponibles
+    const authAccounts = ConfigManager.getAuthAccounts()
+    const authKeys = Object.keys(authAccounts)
+    
+    // Si no hay cuentas disponibles, no mostrar el overlay
+    if(authKeys.length === 0 && toggleState === true){
+        // Si estamos intentando mostrar el overlay y no hay cuentas, redirigir a la pantalla de inicio de sesión
+        loginOptionsCancelEnabled(false)
+        loginOptionsViewOnLoginSuccess = VIEWS.settings
+        loginOptionsViewOnLoginCancel = VIEWS.login
+        switchView(getCurrentView(), VIEWS.login)
+        return
+    }
+    
+    // Si solo hay una cuenta y estamos tratando de mostrar el overlay (no en modo popup)
+    if(authKeys.length === 1 && !popup && toggleState === true){
+        // Simplemente seleccionar la única cuenta disponible sin mostrar el overlay
+        const account = authAccounts[authKeys[0]]
+        ConfigManager.setSelectedAccount(account.clientToken)
+        ConfigManager.save()
+        updateSelectedAccount(account)
+        validateSelectedAccount()
+        return
+    }
+    
     if (popup) {
         // set the accountSelectActions div to display: none to avoid colliding with the validateSelectedAccount function
         document.getElementById('accountSelectActions').style.display = 'none'
@@ -150,6 +180,15 @@ async function toggleAccountSelection(toggleState, popup = false){
 }
 
 async function toggleProfileSwitch(toggleState, popup = false){    
+    // Verificar si hay cuentas disponibles en la cuenta actual
+    const account = ConfigManager.getSelectedAccount()
+    
+    // Si no hay cuenta seleccionada o no tiene perfiles disponibles, no mostrar el overlay
+    if(!account || !account.availableProfiles || account.availableProfiles.length === 0){
+        console.warn('No hay perfiles disponibles para cambiar')
+        return
+    }
+    
     if (popup) {
         // set the accountSelectActions div to display: none to avoid colliding with the validateSelectedAccount function
         document.getElementById('accountSelectActions').style.display = 'none'
@@ -161,6 +200,21 @@ async function toggleProfileSwitch(toggleState, popup = false){
     // show the overlay
     await prepareProfilesList()
     toggleOverlay(toggleState, false, 'accountSelectContent', popup)
+}
+
+/**
+ * Toggle the profile selection overlay.
+ * 
+ * @param {boolean} toggleState True to display, false to hide.
+ * @param {Object} authData Authentication data containing availableProfiles.
+ * @param {function} acceptCallback Callback function to invoke when a profile is selected.
+ * @param {function} cancelCallback Callback function to invoke when profile selection is cancelled.
+ */
+async function toggleProfileSelection(toggleState, authData, acceptCallback, cancelCallback) {
+    // Preparar el contenido de selección de perfil
+    prepareProfileSelectionList(authData, acceptCallback, cancelCallback);
+    // Usar la función principal de overlay con el contenido correcto
+    toggleOverlay(toggleState, false, 'profileSelectContent', true);
 }
 
 /**
@@ -545,81 +599,6 @@ function prepareProfileSelectionList(authData, acceptCallback, cancelCallback) {
     // Store authData to use when clicking outside
     overlayContainer.setAttribute('data-auth-access-token', authData.accessToken)
     overlayContainer.setAttribute('data-auth-client-token', authData.clientToken)
-}
-
-// Modificamos la función toggleOverlay para que también pueda mostrar el contenido de selección de perfiles
-let originalToggleOverlay = window.toggleOverlay
-if (typeof originalToggleOverlay === 'function') {
-    window.toggleOverlay = function(toggleState, dismissable = false, content = 'profileSelectContent', popup = false) {
-        if (content === 'profileSelectContent') {
-            if(toggleState == null){
-                toggleState = !document.getElementById('main').hasAttribute('overlay')
-            }
-            
-            if(toggleState){
-                document.getElementById('main').setAttribute('overlay', true)
-                document.getElementById('overlayContainer').setAttribute('content', content)
-                document.getElementById('overlayContainer').setAttribute('popup', popup)
-                
-                // Make things untabbable.
-                $('#main *').attr('tabindex', '-1')
-                $('#' + content).parent().children().hide()
-                $('#' + content).show()
-            }
-            
-            return originalToggleOverlay(toggleState, dismissable, content, popup)
-        } else {
-            return originalToggleOverlay(toggleState, dismissable, content, popup)
-        }
-    }
-} else {
-    // Si no existe la función original, dejamos nuestra implementación que maneja profileSelectContent
-    window.toggleOverlay = function(toggleState, dismissable = false, contentId = 'overlayContent'){
-        if(toggleState == null){
-            // Toggle
-            toggleOverlay(!overlay.hasAttribute('show'))
-        } else if(toggleState) {
-            // Show
-            if(contentId === 'overlayContent') {
-                document.getElementById('overlayContent').style.display = 'flex'
-                document.getElementById('serverSelectContent').style.display = 'none'
-                document.getElementById('accountSelectContent').style.display = 'none'
-                document.getElementById('profileSelectContent').style.display = 'none'
-                document.getElementById('overlayDismiss').style.display = dismissable ? 'block' : 'none'
-            } else if(contentId === 'serverSelectContent') {
-                document.getElementById('serverSelectContent').style.display = 'flex'
-                document.getElementById('overlayContent').style.display = 'none'
-                document.getElementById('accountSelectContent').style.display = 'none'
-                document.getElementById('profileSelectContent').style.display = 'none'
-            } else if(contentId === 'accountSelectContent') {
-                document.getElementById('accountSelectContent').style.display = 'flex'
-                document.getElementById('overlayContent').style.display = 'none'
-                document.getElementById('serverSelectContent').style.display = 'none'
-                document.getElementById('profileSelectContent').style.display = 'none'
-            } else if(contentId === 'profileSelectContent') {
-                document.getElementById('profileSelectContent').style.display = 'flex'
-                document.getElementById('overlayContent').style.display = 'none'
-                document.getElementById('serverSelectContent').style.display = 'none'
-                document.getElementById('accountSelectContent').style.display = 'none'
-            }
-
-            overlay.setAttribute('show', '')
-            
-            // Bind key listeners based on the content that's displayed.
-            bindOverlayKeys(true, contentId, dismissable)
-        } else {
-            // Hide
-            overlay.removeAttribute('show')
-            document.getElementById('overlayContent').style.display = 'flex'
-            document.getElementById('serverSelectContent').style.display = 'none'
-            document.getElementById('accountSelectContent').style.display = 'none'
-            document.getElementById('profileSelectContent').style.display = 'none'
-            document.getElementById('overlayDismiss').style.display = 'none'
-            
-            // Unbind key listeners.
-            bindOverlayKeys(false)
-        }
-    }
 }
 
 /**

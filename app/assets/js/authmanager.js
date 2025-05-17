@@ -302,14 +302,56 @@ exports.addMojangAccount = async function(username, password) {
  */
 exports.selectMojangProfile = async function(accessToken, clientToken, uuid, name) {
     try {
-        // Generamos un nuevo clientToken para el refresh
-        const newClientToken = ConfigManager.generateClientToken()
-        log.info('Generando nuevo clientToken para refresh:', newClientToken.substring(0, 6) + '...')
+        // IMPORTANTE: Debemos usar el mismo clientToken que se usó en la autenticación original
+        log.info('Usando clientToken original para refresh:', clientToken.substring(0, 6) + '...')
         
-        // Usamos el nuevo token para el refresh
-        const refreshResponse = await MojangRestAPI.refresh(accessToken, clientToken, uuid, name, newClientToken)
+        // Usamos el token original para el refresh
+        const refreshResponse = await MojangRestAPI.refresh(accessToken, clientToken, uuid, name)
+        
+        // Verificar que tenemos datos válidos antes de devolverlos
+        if (!refreshResponse || !refreshResponse.data) {
+            log.error('Respuesta de refresh inesperada:', refreshResponse)
+            throw new Error('invalid_refresh_response')
+        }
+        
+        // Verificar que la respuesta contiene el perfil seleccionado
+        if (!refreshResponse.data.selectedProfile) {
+            log.error('Respuesta de refresh sin perfil seleccionado:', refreshResponse.data)
+            throw new Error('missing_selected_profile')
+        }
+        
         return refreshResponse.data
     } catch (err) {
+        // Mejorar el logging de errores
+        if (err.response && err.response.statusCode === 500) {
+            log.error('Error 500 del servidor durante refresh:', err.message)
+            log.debug('Detalles de la respuesta:', err.response.body)
+            
+            return Promise.reject({
+                title: Lang.queryJS('auth.mojang.error.serverErrorTitle') || 'Error del servidor',
+                desc: Lang.queryJS('auth.mojang.error.serverErrorDesc') || 
+                      'Error interno del servidor (500). Por favor, intenta más tarde.'
+            })
+        }
+        
+        // Si es un error personalizado que generamos nosotros
+        if (err.message === 'invalid_refresh_response') {
+            return Promise.reject({
+                title: Lang.queryJS('auth.mojang.error.invalidResponseTitle') || 'Respuesta inválida',
+                desc: Lang.queryJS('auth.mojang.error.invalidResponseDesc') || 
+                      'El servidor devolvió una respuesta inválida. Por favor, intenta nuevamente.'
+            })
+        }
+        
+        if (err.message === 'missing_selected_profile') {
+            return Promise.reject({
+                title: Lang.queryJS('auth.mojang.error.missingProfileTitle') || 'Perfil no encontrado',
+                desc: Lang.queryJS('auth.mojang.error.missingProfileDesc') || 
+                      'No se encontró el perfil seleccionado en la respuesta del servidor.'
+            })
+        }
+        
+        // Para otros errores, usamos el handler existente
         return Promise.reject(mojangErrorDisplayable(err))
     }
 }
